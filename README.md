@@ -1,5 +1,5 @@
 # GASPI.jl
-GASPI.jl is a lightweight Julia wrapper for any GASPI-conforming library.
+GASPI.jl is a lightweight Julia wrapper for any [GASPI](https://www.gaspi.de/)-conforming library.
 
 
 ## Installation
@@ -12,13 +12,13 @@ Execute the following command to install GASPI:
 julia -e 'using Pkg; Pkg.add("https://github.com/sloede/GASPI.jl.git")'
 ```
 
-Before using GASPI via GASPI.jl, you need to specify the path to the GASPI
-library you want to use. Thus you need to have a GASPI library installed on your
-system prior to using GASPI.jl. Execute
+Before using GASPI.jl, you need to specify the path to the GASPI
+library you want to use. Thus you need to have a GASPI-conforming library installed on your
+system, e.g., [GPI-2](https://github.com/cc-hpc-itwm/GPI-2). Execute
 ```julia
 julia -e 'using GASPI; set_gaspi_library!("/path/to/libGPI2.so")'
 ```
-where `/path/to/libGPI.so` should be the absolute path to your GASPI library,
+where `/path/to/libGPI.so` should be the absolute path to your *shared* GASPI library,
 e.g., to `libGPI2.so` if you are on Linux and using the
 [GPI-2](https://github.com/cc-hpc-itwm/GPI-2) library. This step is necessary
 only once per project in which you use GASPI.jl.
