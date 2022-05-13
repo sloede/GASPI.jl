@@ -1,0 +1,8 @@
+name = "GASPI"
+uuid = "25b41d81-8c24-4365-b92c-8a77f3140560"
+authors = ["Michael Schlottke-Lakemper <michael@sloede.com>"]
+version = "0.1.0"
+
+[deps]
+Preferences = "21216c6a-2e73-6563-6e65-726566657250"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
