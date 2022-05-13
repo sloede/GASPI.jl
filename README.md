@@ -4,7 +4,7 @@ GASPI.jl is a lightweight Julia wrapper for any GASPI-conforming library.
 
 ## Installation
 If you have not yet installed Julia, please [follow the instructions for your
-operating system](https://julialang.org/downloads/platform/). Trixi works
+operating system](https://julialang.org/downloads/platform/). GASPI.jl works
 with Julia v1.7.
 
 Execute the following command to install GASPI:
@@ -27,7 +27,7 @@ only once per project in which you use GASPI.jl.
 ## Usage
 You can start running GASPI functions after executing `using GASPI`. All GASPI
 functions are prefixed by `gaspi_`. For example, to check the version of the
-currently used GASPI library, start the Julia REPL and past the following
+currently used GASPI library, start the Julia REPL and paste the following
 snippet:
 ```julia
 julia> using GASPI
