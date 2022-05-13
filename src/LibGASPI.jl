@@ -976,6 +976,11 @@ function gaspi_pcontrol(argument)
     ccall((:gaspi_pcontrol, get_gaspi_library()), gaspi_return_t, (gaspi_pointer_t,), argument)
 end
 
+const GASPI_GROUP_ALL = gaspi_rank_t(0)
+const GASPI_BLOCK = gaspi_timeout_t(0xffffffffffffffff)
+const GASPI_TEST = gaspi_timeout_t(0x0)
+
+
 # exports
 const PREFIXES = ["gaspi_", "GASPI_"]
 for name in names(@__MODULE__; all=true), prefix in PREFIXES
