@@ -86,7 +86,7 @@ gaspi_run -m <machinefile> $(which julia) /abs/path/to/launcher.jl $(pwd)/gaspi-
 The `<machinefile>` is the normal machinefile with all nodes on which to start a
 GASPI rank. `$(which julia)` is required since without `module` support, the
 remote ranks might not know where the Julia executable is located. The
-`/abs/path/to/launcher.jl` must be an *absolute* path again. The launcher will
+`/abs/path/to/launcher.jl` must be an *absolute* path again. The launcher script will
 take care of recreating the environment using the information in the TOML file
 `$(pwd)/gaspi-jl-env.toml`. Finally, you can provide the path to the Julia
 programm (and optional command line arguments to it) as the final part. The path
