@@ -795,7 +795,7 @@ end
 List of writes.
 
 ### Parameters
-* `num`: The number of list elements (see also gaspi\\_rw\\_list\\_elem\\_max)
+* `num`: The number of list elements (see also [`gaspi_rw_list_elem_max`](@ref))
 * `segment_id_local`: List of local segments with data to be written.
 * `offset_local`: List of local offsets with data to be written.
 * `rank`: Rank to which will be written.
@@ -1751,13 +1751,1336 @@ const gaspi_float = Cfloat
 
 const gaspi_double = Cdouble
 
+"""
+    gaspi_initialized(initialized)
+
+Check if GPI-2 is initialized
+
+### Parameters
+* `initialized`: Output parameter with flag value.
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_initialized (gaspi_number_t * initialized);
+```
+"""
+function gaspi_initialized(initialized)
+    ccall((:gaspi_initialized, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), initialized)
+end
+
+"""
+    gaspi_proc_local_rank(local_rank)
+
+Get the process local rank.
+
+### Parameters
+* `local_rank`: Rank within a node of calling process.
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_proc_local_rank (gaspi_rank_t * const local_rank);
+```
+"""
+function gaspi_proc_local_rank(local_rank)
+    ccall((:gaspi_proc_local_rank, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), local_rank)
+end
+
+"""
+    gaspi_proc_local_num(local_num)
+
+Get the number of processes (ranks) started by the application.
+
+### Parameters
+* `local_num`: The number of processes (ranks) in the same node
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_proc_local_num (gaspi_rank_t * const local_num);
+```
+"""
+function gaspi_proc_local_num(local_num)
+    ccall((:gaspi_proc_local_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), local_num)
+end
+
+"""
+    gaspi_cpu_frequency(cpu_mhz)
+
+Get the CPU frequency.
+
+### Parameters
+* `cpu_mhz`: Output parameter with the frequency.
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_cpu_frequency (gaspi_float * const cpu_mhz);
+```
+"""
+function gaspi_cpu_frequency(cpu_mhz)
+    ccall((:gaspi_cpu_frequency, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_float},), cpu_mhz)
+end
+
+"""
+    gaspi_print_affinity_mask()
+
+Print the CPU's affinity mask.
+
+### Prototype
+```c
+void gaspi_print_affinity_mask (void);
+```
+"""
+function gaspi_print_affinity_mask()
+    ccall((:gaspi_print_affinity_mask, get_gpi2_library()), Cvoid, ())
+end
+
+"""
+    gaspi_numa_socket(socket)
+
+Get NUMA socket
+
+### Parameters
+* `socket`: Output parameter with the socket
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case GPI2 was not started with NUMA enabled.
+### Prototype
+```c
+gaspi_return_t gaspi_numa_socket(gaspi_uchar * const socket);
+```
+"""
+function gaspi_numa_socket(socket)
+    ccall((:gaspi_numa_socket, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_uchar},), socket)
+end
+
+"""
+    gaspi_set_socket_affinity(socket)
+
+Set socket affinity
+
+### Prototype
+```c
+gaspi_return_t gaspi_set_socket_affinity (const gaspi_uchar socket);
+```
+"""
+function gaspi_set_socket_affinity(socket)
+    ccall((:gaspi_set_socket_affinity, get_gpi2_library()), gaspi_return_t, (gaspi_uchar,), socket)
+end
+
+"""
+    gaspi_error_str(error_code)
+
+Get string describing return value. This is slightly more practical than [`gaspi_print_error`](@ref).
+
+### Parameters
+* `error_code`: The return value to be described.
+### Returns
+A string that describes the return value.
+### Prototype
+```c
+gaspi_string_t gaspi_error_str(gaspi_return_t error_code);
+```
+"""
+function gaspi_error_str(error_code)
+    ccall((:gaspi_error_str, get_gpi2_library()), gaspi_string_t, (gaspi_return_t,), error_code)
+end
+
+"""
+    gaspi_proc_ping(rank, tout)
+
+Ping a particular proc (rank). This is useful in FT applications to determine if a rank is alive.
+
+### Parameters
+* `rank`: The rank to ping.
+* `tout`: A timeout value in milliseconds.
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_proc_ping (const gaspi_rank_t rank, gaspi_timeout_t tout);
+```
+"""
+function gaspi_proc_ping(rank, tout)
+    ccall((:gaspi_proc_ping, get_gpi2_library()), gaspi_return_t, (gaspi_rank_t, gaspi_timeout_t), rank, tout)
+end
+
+"""
+    gaspi_segment_avail_local(avail_seg_id)
+
+Get an available segment id (only locally).
+
+To create/alloc a segment, the application must provide a segment id. This provides a helper function to find the next available id locally i.e. for the calling rank.
+
+### Parameters
+* `avail_seg_id`: The available segment id.
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_segment_avail_local (gaspi_segment_id_t* const avail_seg_id);
+```
+"""
+function gaspi_segment_avail_local(avail_seg_id)
+    ccall((:gaspi_segment_avail_local, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_segment_id_t},), avail_seg_id)
+end
+
+"""
+    gaspi_segment_size(segment_id, rank, size)
+
+Get the size of a given segment on a particular rank.
+
+### Parameters
+* `segment_id`: The segment id we are interested in.
+* `rank`: The rank.
+* `size`: Output parameter with the size of the segment.
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_segment_size (const gaspi_segment_id_t segment_id, const gaspi_rank_t rank, gaspi_size_t * const size);
+```
+"""
+function gaspi_segment_size(segment_id, rank, size)
+    ccall((:gaspi_segment_size, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_rank_t, Ptr{gaspi_size_t}), segment_id, rank, size)
+end
+
+"""
+    gaspi_rw_list_elem_max(elem_max)
+
+Get the maximum number of elements allowed in list (read, write) operations.
+
+### Parameters
+* `elem_max`: Output parameter with the maximum number of elements.
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_rw_list_elem_max (gaspi_number_t * const elem_max);
+```
+"""
+function gaspi_rw_list_elem_max(elem_max)
+    ccall((:gaspi_rw_list_elem_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), elem_max)
+end
+
+"""
+    gaspi_threads_get_tid(tid)
+
+Get thread identifier
+
+### Parameters
+* `Output`: parameter with thread identifier
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_threads_get_tid(gaspi_int * const tid) __attribute__ ((deprecated));
+```
+"""
+function gaspi_threads_get_tid(tid)
+    ccall((:gaspi_threads_get_tid, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_int},), tid)
+end
+
+"""
+    gaspi_threads_get_total(num)
+
+Get total number of threads
+
+### Parameters
+* `Output`: parameter with total number of threads
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_threads_get_total(gaspi_int *const num) __attribute__ ((deprecated));
+```
+"""
+function gaspi_threads_get_total(num)
+    ccall((:gaspi_threads_get_total, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_int},), num)
+end
+
+"""
+    gaspi_threads_get_num_cores(cores)
+
+Get total number of available cpu cores
+
+### Parameters
+* `cores`: Output paramter with the number of cores.
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_threads_get_num_cores(gaspi_int * const cores) __attribute__ ((deprecated));
+```
+"""
+function gaspi_threads_get_num_cores(cores)
+    ccall((:gaspi_threads_get_num_cores, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_int},), cores)
+end
+
+"""
+    gaspi_threads_init(num)
+
+Initialize threads (in all available cores)
+
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_threads_init(gaspi_int * const num) __attribute__ ((deprecated));
+```
+"""
+function gaspi_threads_init(num)
+    ccall((:gaspi_threads_init, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_int},), num)
+end
+
+"""
+    gaspi_threads_init_user(use_nr_of_threads)
+
+Initialize threads (a particular number of threads)
+
+### Parameters
+* `use_nr_of_threads`: Number of threads to start.
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_threads_init_user(const unsigned int use_nr_of_threads) __attribute__ ((deprecated));
+```
+"""
+function gaspi_threads_init_user(use_nr_of_threads)
+    ccall((:gaspi_threads_init_user, get_gpi2_library()), gaspi_return_t, (Cuint,), use_nr_of_threads)
+end
+
+"""
+    gaspi_threads_term()
+
+Finalize threads
+
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_threads_term(void) __attribute__ ((deprecated));
+```
+"""
+function gaspi_threads_term()
+    ccall((:gaspi_threads_term, get_gpi2_library()), gaspi_return_t, ())
+end
+
+"""
+    gaspi_threads_run(_function, arg)
+
+Run a particular task (function)
+
+### Parameters
+* `function`: The function to run.
+* `arg`: The arguments of the function to run.
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_threads_run(void* (*function)(void*), void *arg) __attribute__ ((deprecated));
+```
+"""
+function gaspi_threads_run(_function, arg)
+    ccall((:gaspi_threads_run, get_gpi2_library()), gaspi_return_t, (Ptr{Cvoid}, Ptr{Cvoid}), _function, arg)
+end
+
+"""
+    gaspi_threads_register(tid)
+
+Register a thread with the pool.
+
+### Parameters
+* `tid`: Output parameter with the thread identifier.
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_threads_register(gaspi_int * tid);
+```
+"""
+function gaspi_threads_register(tid)
+    ccall((:gaspi_threads_register, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_int},), tid)
+end
+
+"""
+    gaspi_threads_sync()
+
+Synchronize all local threads (local barrier).
+
+### Prototype
+```c
+void gaspi_threads_sync(void);
+```
+"""
+function gaspi_threads_sync()
+    ccall((:gaspi_threads_sync, get_gpi2_library()), Cvoid, ())
+end
+
+"""
+    gaspi_threads_sync_all(g, timeout_ms)
+
+Synchronize all threads in a group (global barrier). Implies a [`gaspi_barrier`](@ref) within the group.
+
+### Parameters
+* `group`: The group involved in the barrier.
+* `timeout`: The timeout to be applied in the global barrier([`gaspi_barrier`](@ref)).
+### Returns
+GASPI\\_SUCCESS in case of success, GASPI\\_ERROR in case of error.
+### Prototype
+```c
+gaspi_return_t gaspi_threads_sync_all(const gaspi_group_t g, const gaspi_timeout_t timeout_ms) __attribute__ ((deprecated));
+```
+"""
+function gaspi_threads_sync_all(g, timeout_ms)
+    ccall((:gaspi_threads_sync_all, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, gaspi_timeout_t), g, timeout_ms)
+end
+
+"""
+    pgaspi_config_get(config)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_config_get (gaspi_config_t * const config);
+```
+"""
+function pgaspi_config_get(config)
+    ccall((:pgaspi_config_get, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_config_t},), config)
+end
+
+"""
+    pgaspi_config_set(new_config)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_config_set (const gaspi_config_t new_config);
+```
+"""
+function pgaspi_config_set(new_config)
+    ccall((:pgaspi_config_set, get_gpi2_library()), gaspi_return_t, (gaspi_config_t,), new_config)
+end
+
+"""
+    pgaspi_version(version)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_version (float *version);
+```
+"""
+function pgaspi_version(version)
+    ccall((:pgaspi_version, get_gpi2_library()), gaspi_return_t, (Ptr{Cfloat},), version)
+end
+
+"""
+    pgaspi_proc_init(timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_proc_init (const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_proc_init(timeout_ms)
+    ccall((:pgaspi_proc_init, get_gpi2_library()), gaspi_return_t, (gaspi_timeout_t,), timeout_ms)
+end
+
+"""
+    pgaspi_initialized(initialized)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_initialized (gaspi_number_t * initialized);
+```
+"""
+function pgaspi_initialized(initialized)
+    ccall((:pgaspi_initialized, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), initialized)
+end
+
+"""
+    pgaspi_proc_term(timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_proc_term (const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_proc_term(timeout_ms)
+    ccall((:pgaspi_proc_term, get_gpi2_library()), gaspi_return_t, (gaspi_timeout_t,), timeout_ms)
+end
+
+"""
+    pgaspi_proc_local_rank(local_rank)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_proc_local_rank (gaspi_rank_t * const local_rank);
+```
+"""
+function pgaspi_proc_local_rank(local_rank)
+    ccall((:pgaspi_proc_local_rank, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), local_rank)
+end
+
+"""
+    pgaspi_proc_local_num(local_num)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_proc_local_num (gaspi_rank_t * const local_num);
+```
+"""
+function pgaspi_proc_local_num(local_num)
+    ccall((:pgaspi_proc_local_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), local_num)
+end
+
+"""
+    pgaspi_proc_rank(rank)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_proc_rank (gaspi_rank_t * const rank);
+```
+"""
+function pgaspi_proc_rank(rank)
+    ccall((:pgaspi_proc_rank, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), rank)
+end
+
+"""
+    pgaspi_proc_num(proc_num)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_proc_num (gaspi_rank_t * const proc_num);
+```
+"""
+function pgaspi_proc_num(proc_num)
+    ccall((:pgaspi_proc_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), proc_num)
+end
+
+"""
+    pgaspi_proc_kill(rank, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_proc_kill (const gaspi_rank_t rank, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_proc_kill(rank, timeout_ms)
+    ccall((:pgaspi_proc_kill, get_gpi2_library()), gaspi_return_t, (gaspi_rank_t, gaspi_timeout_t), rank, timeout_ms)
+end
+
+"""
+    pgaspi_connect(rank, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_connect (const gaspi_rank_t rank, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_connect(rank, timeout_ms)
+    ccall((:pgaspi_connect, get_gpi2_library()), gaspi_return_t, (gaspi_rank_t, gaspi_timeout_t), rank, timeout_ms)
+end
+
+"""
+    pgaspi_disconnect(rank, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_disconnect (const gaspi_rank_t rank, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_disconnect(rank, timeout_ms)
+    ccall((:pgaspi_disconnect, get_gpi2_library()), gaspi_return_t, (gaspi_rank_t, gaspi_timeout_t), rank, timeout_ms)
+end
+
+"""
+    pgaspi_group_create(group)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_group_create (gaspi_group_t * const group);
+```
+"""
+function pgaspi_group_create(group)
+    ccall((:pgaspi_group_create, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_group_t},), group)
+end
+
+"""
+    pgaspi_group_delete(group)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_group_delete (const gaspi_group_t group);
+```
+"""
+function pgaspi_group_delete(group)
+    ccall((:pgaspi_group_delete, get_gpi2_library()), gaspi_return_t, (gaspi_group_t,), group)
+end
+
+"""
+    pgaspi_group_add(group, rank)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_group_add (const gaspi_group_t group, const gaspi_rank_t rank);
+```
+"""
+function pgaspi_group_add(group, rank)
+    ccall((:pgaspi_group_add, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, gaspi_rank_t), group, rank)
+end
+
+"""
+    pgaspi_group_commit(group, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_group_commit (const gaspi_group_t group, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_group_commit(group, timeout_ms)
+    ccall((:pgaspi_group_commit, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, gaspi_timeout_t), group, timeout_ms)
+end
+
+"""
+    pgaspi_group_num(group_num)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_group_num (gaspi_number_t * const group_num);
+```
+"""
+function pgaspi_group_num(group_num)
+    ccall((:pgaspi_group_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), group_num)
+end
+
+"""
+    pgaspi_group_size(group, group_size)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_group_size (const gaspi_group_t group, gaspi_number_t * const group_size);
+```
+"""
+function pgaspi_group_size(group, group_size)
+    ccall((:pgaspi_group_size, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, Ptr{gaspi_number_t}), group, group_size)
+end
+
+"""
+    pgaspi_group_ranks(group, group_ranks)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_group_ranks (const gaspi_group_t group, gaspi_rank_t * const group_ranks);
+```
+"""
+function pgaspi_group_ranks(group, group_ranks)
+    ccall((:pgaspi_group_ranks, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, Ptr{gaspi_rank_t}), group, group_ranks)
+end
+
+"""
+    pgaspi_group_max(group_max)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_group_max (gaspi_number_t * const group_max);
+```
+"""
+function pgaspi_group_max(group_max)
+    ccall((:pgaspi_group_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), group_max)
+end
+
+"""
+    pgaspi_segment_alloc(segment_id, size, alloc_policy)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_segment_alloc (const gaspi_segment_id_t segment_id, const gaspi_size_t size, const gaspi_alloc_t alloc_policy);
+```
+"""
+function pgaspi_segment_alloc(segment_id, size, alloc_policy)
+    ccall((:pgaspi_segment_alloc, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_size_t, gaspi_alloc_t), segment_id, size, alloc_policy)
+end
+
+"""
+    pgaspi_segment_delete(segment_id)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_segment_delete (const gaspi_segment_id_t segment_id);
+```
+"""
+function pgaspi_segment_delete(segment_id)
+    ccall((:pgaspi_segment_delete, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t,), segment_id)
+end
+
+"""
+    pgaspi_segment_register(segment_id, rank, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_segment_register (const gaspi_segment_id_t segment_id, const gaspi_rank_t rank, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_segment_register(segment_id, rank, timeout_ms)
+    ccall((:pgaspi_segment_register, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_rank_t, gaspi_timeout_t), segment_id, rank, timeout_ms)
+end
+
+"""
+    pgaspi_segment_create(segment_id, size, group, timeout_ms, alloc_policy)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_segment_create (const gaspi_segment_id_t segment_id, const gaspi_size_t size, const gaspi_group_t group, const gaspi_timeout_t timeout_ms, const gaspi_alloc_t alloc_policy);
+```
+"""
+function pgaspi_segment_create(segment_id, size, group, timeout_ms, alloc_policy)
+    ccall((:pgaspi_segment_create, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_size_t, gaspi_group_t, gaspi_timeout_t, gaspi_alloc_t), segment_id, size, group, timeout_ms, alloc_policy)
+end
+
+"""
+    pgaspi_segment_bind(segment_id, pointer, size, memory_description)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_segment_bind ( gaspi_segment_id_t const segment_id, gaspi_pointer_t const pointer, gaspi_size_t const size, gaspi_memory_description_t const memory_description);
+```
+"""
+function pgaspi_segment_bind(segment_id, pointer, size, memory_description)
+    ccall((:pgaspi_segment_bind, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_pointer_t, gaspi_size_t, gaspi_memory_description_t), segment_id, pointer, size, memory_description)
+end
+
+"""
+    pgaspi_segment_use(segment_id, pointer, size, group, timeout, memory_description)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_segment_use ( gaspi_segment_id_t const segment_id, gaspi_pointer_t const pointer, gaspi_size_t const size, gaspi_group_t const group, gaspi_timeout_t const timeout, gaspi_memory_description_t const memory_description);
+```
+"""
+function pgaspi_segment_use(segment_id, pointer, size, group, timeout, memory_description)
+    ccall((:pgaspi_segment_use, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_pointer_t, gaspi_size_t, gaspi_group_t, gaspi_timeout_t, gaspi_memory_description_t), segment_id, pointer, size, group, timeout, memory_description)
+end
+
+"""
+    pgaspi_segment_num(segment_num)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_segment_num (gaspi_number_t * const segment_num);
+```
+"""
+function pgaspi_segment_num(segment_num)
+    ccall((:pgaspi_segment_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), segment_num)
+end
+
+"""
+    pgaspi_segment_list(num, segment_id_list)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_segment_list (const gaspi_number_t num, gaspi_segment_id_t * const segment_id_list);
+```
+"""
+function pgaspi_segment_list(num, segment_id_list)
+    ccall((:pgaspi_segment_list, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}), num, segment_id_list)
+end
+
+"""
+    pgaspi_segment_ptr(segment_id, ptr)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_segment_ptr (const gaspi_segment_id_t segment_id, gaspi_pointer_t * ptr);
+```
+"""
+function pgaspi_segment_ptr(segment_id, ptr)
+    ccall((:pgaspi_segment_ptr, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, Ptr{gaspi_pointer_t}), segment_id, ptr)
+end
+
+"""
+    pgaspi_segment_size(segment_id, rank, size)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_segment_size (const gaspi_segment_id_t segment_id, const gaspi_rank_t rank, gaspi_size_t * const size);
+```
+"""
+function pgaspi_segment_size(segment_id, rank, size)
+    ccall((:pgaspi_segment_size, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_rank_t, Ptr{gaspi_size_t}), segment_id, rank, size)
+end
+
+"""
+    pgaspi_segment_max(segment_max)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_segment_max (gaspi_number_t * const segment_max);
+```
+"""
+function pgaspi_segment_max(segment_max)
+    ccall((:pgaspi_segment_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), segment_max)
+end
+
+"""
+    pgaspi_write(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_write (const gaspi_segment_id_t segment_id_local, const gaspi_offset_t offset_local, const gaspi_rank_t rank, const gaspi_segment_id_t segment_id_remote, const gaspi_offset_t offset_remote, const gaspi_size_t size, const gaspi_queue_id_t queue, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_write(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    ccall((:pgaspi_write, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+end
+
+"""
+    pgaspi_read(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_read (const gaspi_segment_id_t segment_id_local, const gaspi_offset_t offset_local, const gaspi_rank_t rank, const gaspi_segment_id_t segment_id_remote, const gaspi_offset_t offset_remote, const gaspi_size_t size, const gaspi_queue_id_t queue, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_read(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    ccall((:pgaspi_read, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+end
+
+"""
+    pgaspi_write_list(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_write_list (const gaspi_number_t num, gaspi_segment_id_t * const segment_id_local, gaspi_offset_t * const offset_local, const gaspi_rank_t rank, gaspi_segment_id_t * const segment_id_remote, gaspi_offset_t * const offset_remote, gaspi_size_t * const size, const gaspi_queue_id_t queue, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_write_list(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    ccall((:pgaspi_write_list, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+end
+
+"""
+    pgaspi_read_list(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_read_list (const gaspi_number_t num, gaspi_segment_id_t * const segment_id_local, gaspi_offset_t * const offset_local, const gaspi_rank_t rank, gaspi_segment_id_t * const segment_id_remote, gaspi_offset_t * const offset_remote, gaspi_size_t * const size, const gaspi_queue_id_t queue, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_read_list(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    ccall((:pgaspi_read_list, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+end
+
+"""
+    pgaspi_wait(queue, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_wait (const gaspi_queue_id_t queue, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_wait(queue, timeout_ms)
+    ccall((:pgaspi_wait, get_gpi2_library()), gaspi_return_t, (gaspi_queue_id_t, gaspi_timeout_t), queue, timeout_ms)
+end
+
+"""
+    pgaspi_barrier(group, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_barrier (const gaspi_group_t group, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_barrier(group, timeout_ms)
+    ccall((:pgaspi_barrier, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, gaspi_timeout_t), group, timeout_ms)
+end
+
+"""
+    pgaspi_allreduce(buffer_send, buffer_receive, num, operation, datatyp, group, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_allreduce (const gaspi_pointer_t buffer_send, gaspi_pointer_t const buffer_receive, const gaspi_number_t num, const gaspi_operation_t operation, const gaspi_datatype_t datatyp, const gaspi_group_t group, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_allreduce(buffer_send, buffer_receive, num, operation, datatyp, group, timeout_ms)
+    ccall((:pgaspi_allreduce, get_gpi2_library()), gaspi_return_t, (gaspi_pointer_t, gaspi_pointer_t, gaspi_number_t, gaspi_operation_t, gaspi_datatype_t, gaspi_group_t, gaspi_timeout_t), buffer_send, buffer_receive, num, operation, datatyp, group, timeout_ms)
+end
+
+"""
+    pgaspi_allreduce_user(buffer_send, buffer_receive, num, element_size, reduce_operation, reduce_state, group, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_allreduce_user (const gaspi_pointer_t buffer_send, gaspi_pointer_t const buffer_receive, const gaspi_number_t num, const gaspi_size_t element_size, gaspi_reduce_operation_t const reduce_operation, gaspi_reduce_state_t const reduce_state, const gaspi_group_t group, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_allreduce_user(buffer_send, buffer_receive, num, element_size, reduce_operation, reduce_state, group, timeout_ms)
+    ccall((:pgaspi_allreduce_user, get_gpi2_library()), gaspi_return_t, (gaspi_pointer_t, gaspi_pointer_t, gaspi_number_t, gaspi_size_t, gaspi_reduce_operation_t, gaspi_reduce_state_t, gaspi_group_t, gaspi_timeout_t), buffer_send, buffer_receive, num, element_size, reduce_operation, reduce_state, group, timeout_ms)
+end
+
+"""
+    pgaspi_atomic_fetch_add(segment_id, offset, rank, val_add, val_old, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_atomic_fetch_add (const gaspi_segment_id_t segment_id, const gaspi_offset_t offset, const gaspi_rank_t rank, const gaspi_atomic_value_t val_add, gaspi_atomic_value_t * const val_old, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_atomic_fetch_add(segment_id, offset, rank, val_add, val_old, timeout_ms)
+    ccall((:pgaspi_atomic_fetch_add, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_atomic_value_t, Ptr{gaspi_atomic_value_t}, gaspi_timeout_t), segment_id, offset, rank, val_add, val_old, timeout_ms)
+end
+
+"""
+    pgaspi_atomic_compare_swap(segment_id, offset, rank, comparator, val_new, val_old, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_atomic_compare_swap (const gaspi_segment_id_t segment_id, const gaspi_offset_t offset, const gaspi_rank_t rank, const gaspi_atomic_value_t comparator, const gaspi_atomic_value_t val_new, gaspi_atomic_value_t * const val_old, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_atomic_compare_swap(segment_id, offset, rank, comparator, val_new, val_old, timeout_ms)
+    ccall((:pgaspi_atomic_compare_swap, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_atomic_value_t, gaspi_atomic_value_t, Ptr{gaspi_atomic_value_t}, gaspi_timeout_t), segment_id, offset, rank, comparator, val_new, val_old, timeout_ms)
+end
+
+"""
+    pgaspi_passive_send(segment_id_local, offset_local, rank, size, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_passive_send (const gaspi_segment_id_t segment_id_local, const gaspi_offset_t offset_local, const gaspi_rank_t rank, const gaspi_size_t size, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_passive_send(segment_id_local, offset_local, rank, size, timeout_ms)
+    ccall((:pgaspi_passive_send, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_size_t, gaspi_timeout_t), segment_id_local, offset_local, rank, size, timeout_ms)
+end
+
+"""
+    pgaspi_passive_receive(segment_id_local, offset_local, rem_rank, size, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_passive_receive (const gaspi_segment_id_t segment_id_local, const gaspi_offset_t offset_local, gaspi_rank_t * const rem_rank, const gaspi_size_t size, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_passive_receive(segment_id_local, offset_local, rem_rank, size, timeout_ms)
+    ccall((:pgaspi_passive_receive, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, Ptr{gaspi_rank_t}, gaspi_size_t, gaspi_timeout_t), segment_id_local, offset_local, rem_rank, size, timeout_ms)
+end
+
+"""
+    pgaspi_notify(segment_id_remote, rank, notification_id, notification_value, queue, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_notify (const gaspi_segment_id_t segment_id_remote, const gaspi_rank_t rank, const gaspi_notification_id_t notification_id, const gaspi_notification_t notification_value, const gaspi_queue_id_t queue, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_notify(segment_id_remote, rank, notification_id, notification_value, queue, timeout_ms)
+    ccall((:pgaspi_notify, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_rank_t, gaspi_notification_id_t, gaspi_notification_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_remote, rank, notification_id, notification_value, queue, timeout_ms)
+end
+
+"""
+    pgaspi_notify_waitsome(segment_id_local, notification_begin, num, first_id, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_notify_waitsome (const gaspi_segment_id_t segment_id_local, const gaspi_notification_id_t notification_begin, const gaspi_number_t num, gaspi_notification_id_t * const first_id, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_notify_waitsome(segment_id_local, notification_begin, num, first_id, timeout_ms)
+    ccall((:pgaspi_notify_waitsome, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_notification_id_t, gaspi_number_t, Ptr{gaspi_notification_id_t}, gaspi_timeout_t), segment_id_local, notification_begin, num, first_id, timeout_ms)
+end
+
+"""
+    pgaspi_notify_reset(segment_id_local, notification_id, old_notification_val)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_notify_reset (const gaspi_segment_id_t segment_id_local, const gaspi_notification_id_t notification_id, gaspi_notification_t * const old_notification_val);
+```
+"""
+function pgaspi_notify_reset(segment_id_local, notification_id, old_notification_val)
+    ccall((:pgaspi_notify_reset, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_notification_id_t, Ptr{gaspi_notification_t}), segment_id_local, notification_id, old_notification_val)
+end
+
+"""
+    pgaspi_write_notify(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, notification_value, queue, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_write_notify (const gaspi_segment_id_t segment_id_local, const gaspi_offset_t offset_local, const gaspi_rank_t rank, const gaspi_segment_id_t segment_id_remote, const gaspi_offset_t offset_remote, const gaspi_size_t size, const gaspi_notification_id_t notification_id, const gaspi_notification_t notification_value, const gaspi_queue_id_t queue, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_write_notify(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, notification_value, queue, timeout_ms)
+    ccall((:pgaspi_write_notify, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_notification_id_t, gaspi_notification_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, notification_value, queue, timeout_ms)
+end
+
+"""
+    pgaspi_write_list_notify(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, notification_value, queue, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_write_list_notify (const gaspi_number_t num, gaspi_segment_id_t * const segment_id_local, gaspi_offset_t * const offset_local, const gaspi_rank_t rank, gaspi_segment_id_t * const segment_id_remote, gaspi_offset_t * const offset_remote, gaspi_size_t * const size, const gaspi_segment_id_t segment_id_notification, const gaspi_notification_id_t notification_id, const gaspi_notification_t notification_value, const gaspi_queue_id_t queue, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_write_list_notify(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, notification_value, queue, timeout_ms)
+    ccall((:pgaspi_write_list_notify, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_segment_id_t, gaspi_notification_id_t, gaspi_notification_t, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, notification_value, queue, timeout_ms)
+end
+
+"""
+    pgaspi_read_notify(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, queue, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_read_notify (const gaspi_segment_id_t segment_id_local, const gaspi_offset_t offset_local, const gaspi_rank_t rank, const gaspi_segment_id_t segment_id_remote, const gaspi_offset_t offset_remote, const gaspi_size_t size, const gaspi_notification_id_t notification_id, const gaspi_queue_id_t queue, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_read_notify(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, queue, timeout_ms)
+    ccall((:pgaspi_read_notify, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_notification_id_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, queue, timeout_ms)
+end
+
+"""
+    pgaspi_read_list_notify(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, queue, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_read_list_notify (const gaspi_number_t num, gaspi_segment_id_t * const segment_id_local, gaspi_offset_t * const offset_local, const gaspi_rank_t rank, gaspi_segment_id_t * const segment_id_remote, gaspi_offset_t * const offset_remote, gaspi_size_t * const size, const gaspi_segment_id_t segment_id_notification, const gaspi_notification_id_t notification_id, const gaspi_queue_id_t queue, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_read_list_notify(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, queue, timeout_ms)
+    ccall((:pgaspi_read_list_notify, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_segment_id_t, gaspi_notification_id_t, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, queue, timeout_ms)
+end
+
+"""
+    pgaspi_queue_size(queue, queue_size)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_queue_size (const gaspi_queue_id_t queue, gaspi_number_t * const queue_size);
+```
+"""
+function pgaspi_queue_size(queue, queue_size)
+    ccall((:pgaspi_queue_size, get_gpi2_library()), gaspi_return_t, (gaspi_queue_id_t, Ptr{gaspi_number_t}), queue, queue_size)
+end
+
+"""
+    pgaspi_queue_num(queue_num)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_queue_num (gaspi_number_t * const queue_num);
+```
+"""
+function pgaspi_queue_num(queue_num)
+    ccall((:pgaspi_queue_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), queue_num)
+end
+
+"""
+    pgaspi_queue_create(queue_id, timeout_ms)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_queue_create(gaspi_queue_id_t * const queue_id, const gaspi_timeout_t timeout_ms);
+```
+"""
+function pgaspi_queue_create(queue_id, timeout_ms)
+    ccall((:pgaspi_queue_create, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_queue_id_t}, gaspi_timeout_t), queue_id, timeout_ms)
+end
+
+"""
+    pgaspi_queue_delete(queue_id)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_queue_delete(const gaspi_queue_id_t queue_id);
+```
+"""
+function pgaspi_queue_delete(queue_id)
+    ccall((:pgaspi_queue_delete, get_gpi2_library()), gaspi_return_t, (gaspi_queue_id_t,), queue_id)
+end
+
+"""
+    pgaspi_queue_size_max(queue_size_max)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_queue_size_max (gaspi_number_t * const queue_size_max);
+```
+"""
+function pgaspi_queue_size_max(queue_size_max)
+    ccall((:pgaspi_queue_size_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), queue_size_max)
+end
+
+"""
+    pgaspi_transfer_size_min(transfer_size_min)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_transfer_size_min (gaspi_size_t * const transfer_size_min);
+```
+"""
+function pgaspi_transfer_size_min(transfer_size_min)
+    ccall((:pgaspi_transfer_size_min, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), transfer_size_min)
+end
+
+"""
+    pgaspi_transfer_size_max(transfer_size_max)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_transfer_size_max (gaspi_size_t * const transfer_size_max);
+```
+"""
+function pgaspi_transfer_size_max(transfer_size_max)
+    ccall((:pgaspi_transfer_size_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), transfer_size_max)
+end
+
+"""
+    pgaspi_notification_num(notification_num)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_notification_num (gaspi_number_t * const notification_num);
+```
+"""
+function pgaspi_notification_num(notification_num)
+    ccall((:pgaspi_notification_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), notification_num)
+end
+
+"""
+    pgaspi_passive_transfer_size_max(passive_transfer_size_max)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_passive_transfer_size_max (gaspi_size_t * const passive_transfer_size_max);
+```
+"""
+function pgaspi_passive_transfer_size_max(passive_transfer_size_max)
+    ccall((:pgaspi_passive_transfer_size_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), passive_transfer_size_max)
+end
+
+"""
+    pgaspi_allreduce_buf_size(buf_size)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_allreduce_buf_size (gaspi_size_t * const buf_size);
+```
+"""
+function pgaspi_allreduce_buf_size(buf_size)
+    ccall((:pgaspi_allreduce_buf_size, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), buf_size)
+end
+
+"""
+    pgaspi_allreduce_elem_max(elem_max)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_allreduce_elem_max (gaspi_number_t * const elem_max);
+```
+"""
+function pgaspi_allreduce_elem_max(elem_max)
+    ccall((:pgaspi_allreduce_elem_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), elem_max)
+end
+
+"""
+    pgaspi_rw_list_elem_max(elem_max)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_rw_list_elem_max (gaspi_number_t * const elem_max);
+```
+"""
+function pgaspi_rw_list_elem_max(elem_max)
+    ccall((:pgaspi_rw_list_elem_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), elem_max)
+end
+
+"""
+    pgaspi_queue_max(queue_max)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_queue_max(gaspi_number_t * const queue_max);
+```
+"""
+function pgaspi_queue_max(queue_max)
+    ccall((:pgaspi_queue_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), queue_max)
+end
+
+"""
+    pgaspi_network_type(network_type)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_network_type (gaspi_network_t * const network_type);
+```
+"""
+function pgaspi_network_type(network_type)
+    ccall((:pgaspi_network_type, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_network_t},), network_type)
+end
+
+"""
+    pgaspi_time_ticks(ticks)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_time_ticks (gaspi_cycles_t * const ticks);
+```
+"""
+function pgaspi_time_ticks(ticks)
+    ccall((:pgaspi_time_ticks, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_cycles_t},), ticks)
+end
+
+"""
+    pgaspi_time_get(wtime)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_time_get (gaspi_time_t * const wtime);
+```
+"""
+function pgaspi_time_get(wtime)
+    ccall((:pgaspi_time_get, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_time_t},), wtime)
+end
+
+"""
+    pgaspi_cpu_frequency(cpu_mhz)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_cpu_frequency (gaspi_float * const cpu_mhz);
+```
+"""
+function pgaspi_cpu_frequency(cpu_mhz)
+    ccall((:pgaspi_cpu_frequency, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_float},), cpu_mhz)
+end
+
+"""
+    pgaspi_state_vec_get(state_vector)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_state_vec_get (gaspi_state_vector_t state_vector);
+```
+"""
+function pgaspi_state_vec_get(state_vector)
+    ccall((:pgaspi_state_vec_get, get_gpi2_library()), gaspi_return_t, (gaspi_state_vector_t,), state_vector)
+end
+
+"""
+    pgaspi_print_affinity_mask()
+
+### Prototype
+```c
+void pgaspi_print_affinity_mask (void);
+```
+"""
+function pgaspi_print_affinity_mask()
+    ccall((:pgaspi_print_affinity_mask, get_gpi2_library()), Cvoid, ())
+end
+
+"""
+    pgaspi_numa_socket(socket)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_numa_socket(gaspi_uchar * const socket);
+```
+"""
+function pgaspi_numa_socket(socket)
+    ccall((:pgaspi_numa_socket, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_uchar},), socket)
+end
+
+"""
+    pgaspi_set_socket_affinity(socket)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_set_socket_affinity (const gaspi_uchar socket);
+```
+"""
+function pgaspi_set_socket_affinity(socket)
+    ccall((:pgaspi_set_socket_affinity, get_gpi2_library()), gaspi_return_t, (gaspi_uchar,), socket)
+end
+
+"""
+    pgaspi_statistic_verbosity_level(_verbosity_level)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_statistic_verbosity_level(gaspi_number_t _verbosity_level);
+```
+"""
+function pgaspi_statistic_verbosity_level(_verbosity_level)
+    ccall((:pgaspi_statistic_verbosity_level, get_gpi2_library()), gaspi_return_t, (gaspi_number_t,), _verbosity_level)
+end
+
+"""
+    pgaspi_statistic_counter_max(counter_max)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_statistic_counter_max(gaspi_statistic_counter_t* counter_max);
+```
+"""
+function pgaspi_statistic_counter_max(counter_max)
+    ccall((:pgaspi_statistic_counter_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_statistic_counter_t},), counter_max)
+end
+
+"""
+    pgaspi_statistic_counter_info(counter, counter_argument, counter_name, counter_description, verbosity_leve)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_statistic_counter_info(gaspi_statistic_counter_t counter, gaspi_statistic_argument_t* counter_argument, gaspi_string_t* counter_name, gaspi_string_t* counter_description, gaspi_number_t* verbosity_leve);
+```
+"""
+function pgaspi_statistic_counter_info(counter, counter_argument, counter_name, counter_description, verbosity_leve)
+    ccall((:pgaspi_statistic_counter_info, get_gpi2_library()), gaspi_return_t, (gaspi_statistic_counter_t, Ptr{gaspi_statistic_argument_t}, Ptr{gaspi_string_t}, Ptr{gaspi_string_t}, Ptr{gaspi_number_t}), counter, counter_argument, counter_name, counter_description, verbosity_leve)
+end
+
+"""
+    pgaspi_statistic_counter_get(counter, argument, valu)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_statistic_counter_get (gaspi_statistic_counter_t counter, gaspi_number_t argument, unsigned long *valu);
+```
+"""
+function pgaspi_statistic_counter_get(counter, argument, valu)
+    ccall((:pgaspi_statistic_counter_get, get_gpi2_library()), gaspi_return_t, (gaspi_statistic_counter_t, gaspi_number_t, Ptr{Culong}), counter, argument, valu)
+end
+
+"""
+    pgaspi_statistic_counter_reset(counter)
+
+### Prototype
+```c
+gaspi_return_t pgaspi_statistic_counter_reset (gaspi_statistic_counter_t counter);
+```
+"""
+function pgaspi_statistic_counter_reset(counter)
+    ccall((:pgaspi_statistic_counter_reset, get_gpi2_library()), gaspi_return_t, (gaspi_statistic_counter_t,), counter)
+end
+
+"""
+    pgaspi_error_str(error_code)
+
+### Prototype
+```c
+gaspi_string_t pgaspi_error_str(gaspi_return_t error_code);
+```
+"""
+function pgaspi_error_str(error_code)
+    ccall((:pgaspi_error_str, get_gpi2_library()), gaspi_string_t, (gaspi_return_t,), error_code)
+end
+
 const GASPI_GROUP_ALL = gaspi_rank_t(0)
 const GASPI_BLOCK = gaspi_timeout_t(0xffffffffffffffff)
 const GASPI_TEST = gaspi_timeout_t(0x0)
 
 
 # exports
-const PREFIXES = ["gaspi_", "GASPI_"]
+const PREFIXES = ["gaspi_", "GASPI_", "pgaspi_", "PGASPI_"]
 for name in names(@__MODULE__; all=true), prefix in PREFIXES
     if startswith(string(name), prefix)
         @eval export $name

@@ -11,7 +11,7 @@ args = get_default_args()  # Note you must call this function firstly and then a
 push!(args, "-I$include_dir")
 
 # set header files
-headers_rel = ["GASPI.h", "GASPI_types.h"]
+headers_rel = ["GASPI.h", "GASPI_types.h", "GASPI_Ext.h", "GASPI_Threads.h", "PGASPI.h"]
 headers = [joinpath(include_dir, header) for header in headers_rel]
 
 # create context
