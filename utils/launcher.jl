@@ -4,7 +4,7 @@ using Pkg
 if length(ARGS) > 0
   filename = ARGS[1]
 else
-  filename = "gaspi-jl-env.toml"
+  filename = "gpi2-jl-env.toml"
 end
 if length(ARGS) > 1
   args = ARGS[2:end]

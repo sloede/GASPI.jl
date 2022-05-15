@@ -2,7 +2,7 @@
 # it could also be an expression as long as `Meta.parse` can parse this string successfully.
 # basically, it should be the `expression` in the following code:
 # ccall((function_name, expression), returntype, (argtype1, ...), argvalue1, ...)
-library_name = "get_gaspi_library()"
+library_name = "get_gpi2_library()"
 
 # this entry allows you to specify different library names for different headers.
 # in the following example:
@@ -12,7 +12,7 @@ library_name = "get_gaspi_library()"
 library_names = {}
 
 # output file path relative to the working directory
-output_file_path = "LibGASPI.jl"
+output_file_path = "LibGPI2.jl"
 
 # if these are set, common file (types and constants) and API file (functions) will be seperated
 # this is for compatibility, so prologue and epilogue are not supported.
@@ -23,7 +23,7 @@ output_file_path = "LibGASPI.jl"
 # module module_name
 #
 # end # module
-module_name = "LibGASPI"
+module_name = "LibGPI2"
 
 # if this entry is not empty, the generator will print the code below to the `output_file_path`.
 # using jll_pkg_name

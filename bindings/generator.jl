@@ -2,7 +2,7 @@ using Clang.Generators
 
 cd(@__DIR__)
 
-include_dir = ENV["GASPI_INCLUDE_DIR"]
+include_dir = ENV["GPI2_INCLUDE_DIR"]
 
 options = load_options(joinpath(@__DIR__, "generator.toml"))
 
