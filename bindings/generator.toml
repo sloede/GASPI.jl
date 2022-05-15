@@ -42,7 +42,7 @@ prologue_file_path = "./prologue.jl"
 
 # the code in the following file will be copy-pasted to `output_file_path` after the generated code.
 # this is often used for applying custom patches.
-epilogue_file_path = ""
+epilogue_file_path = "./epilogue.jl"
 
 # node with an id in the `output_ignorelist` will be ignored in the printing passes.
 # this is very useful for custom editing.
@@ -52,7 +52,7 @@ output_ignorelist = [
 # Julia's `@enum` do not allow duplicated values, so by default, C enums are translated to
 # CEnum.jl's `@cenum`.
 # if this entry is true, `@enum` is used and those duplicated enum constants are just commented.
-use_julia_native_enum_type = true
+use_julia_native_enum_type = false
 
 # use `@cenum` but do not print `using CEnum`.
 # this is useful in the case of using `CEnum` directly in the source tree instead of using `CEnum` as a dependency
