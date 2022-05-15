@@ -4,7 +4,7 @@ using Pkg
 if length(ARGS) > 0
   filename = ARGS[1]
 else
-  filename = "env.toml"
+  filename = "gaspi-jl-env.toml"
 end
 
 data = Dict{String,Any}("ENV" => ENV)
