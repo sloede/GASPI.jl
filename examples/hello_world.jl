@@ -1,4 +1,4 @@
-using GASPI
+using GPI2
 
 gaspi_proc_init(GASPI_BLOCK)
 
