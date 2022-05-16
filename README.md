@@ -95,12 +95,16 @@ to the Julia program may be relative or absolute, since the launcher knows your
 current directory by now.
 
 
-## License and contributing
-The contents of this repository are published under the MIT license (see [LICENSE](LICENSE)). We are
-very happy to accept contributions from everyone, preferably in the form of a PR.
-
-
 ## Authors
-This repository is maintained by
+GPI2.jl is maintained by
 [Michael Schlottke-Lakemper](https://www.hlrs.de/about-us/organization/divisions-departments/av/tasc/)
-(University of Stuttgart, Germany).
+(University of Stuttgart, Germany). The GPI-2 library itself is developed by the
+[Fraunhofer Institute for Industrial Mathematics (ITWM)](https://www.itwm.fraunhofer.de/).
+
+
+## License and contributing
+GPI2.jl is published under the MIT license (see [LICENSE.md](LICENSE.md)). We
+are very happy to accept contributions from everyone, preferably in the form of
+a PR.
+[GPI-2](https://github.com/cc-hpc-itwm/GPI-2) itself is published under the GNU
+General Public license, version 3.
