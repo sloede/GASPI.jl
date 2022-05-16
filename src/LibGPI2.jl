@@ -2,7 +2,12 @@ module LibGPI2
 
 using CEnum
 
-using ..GPI2: get_gpi2_library
+to_c_type(t::Type) = t
+to_c_type_pairs(va_list) = map(enumerate(to_c_type.(va_list))) do (ind, type)
+    :(va_list[$ind]::$type)
+end
+
+using ..GPI2: libGPI2
 
 
 const gaspi_uint = Cuint
@@ -200,7 +205,7 @@ gaspi_return_t gaspi_config_get (gaspi_config_t * const config);
 ```
 """
 function gaspi_config_get(config)
-    ccall((:gaspi_config_get, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_config_t},), config)
+    @ccall libGPI2.gaspi_config_get(config::Ptr{gaspi_config_t})::gaspi_return_t
 end
 
 """
@@ -218,7 +223,7 @@ gaspi_return_t gaspi_config_set (const gaspi_config_t new_config);
 ```
 """
 function gaspi_config_set(new_config)
-    ccall((:gaspi_config_set, get_gpi2_library()), gaspi_return_t, (gaspi_config_t,), new_config)
+    @ccall libGPI2.gaspi_config_set(new_config::gaspi_config_t)::gaspi_return_t
 end
 
 """
@@ -236,7 +241,7 @@ gaspi_return_t gaspi_version (float *version);
 ```
 """
 function gaspi_version(version)
-    ccall((:gaspi_version, get_gpi2_library()), gaspi_return_t, (Ptr{Cfloat},), version)
+    @ccall libGPI2.gaspi_version(version::Ptr{Cfloat})::gaspi_return_t
 end
 
 """
@@ -254,7 +259,7 @@ gaspi_return_t gaspi_proc_init (const gaspi_timeout_t timeout_ms);
 ```
 """
 function gaspi_proc_init(timeout_ms)
-    ccall((:gaspi_proc_init, get_gpi2_library()), gaspi_return_t, (gaspi_timeout_t,), timeout_ms)
+    @ccall libGPI2.gaspi_proc_init(timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -272,7 +277,7 @@ gaspi_return_t gaspi_proc_term (const gaspi_timeout_t timeout_ms);
 ```
 """
 function gaspi_proc_term(timeout_ms)
-    ccall((:gaspi_proc_term, get_gpi2_library()), gaspi_return_t, (gaspi_timeout_t,), timeout_ms)
+    @ccall libGPI2.gaspi_proc_term(timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 const gaspi_rank_t = Cushort
@@ -292,7 +297,7 @@ gaspi_return_t gaspi_proc_rank (gaspi_rank_t * const rank);
 ```
 """
 function gaspi_proc_rank(rank)
-    ccall((:gaspi_proc_rank, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), rank)
+    @ccall libGPI2.gaspi_proc_rank(rank::Ptr{gaspi_rank_t})::gaspi_return_t
 end
 
 """
@@ -310,7 +315,7 @@ gaspi_return_t gaspi_proc_num (gaspi_rank_t * const proc_num);
 ```
 """
 function gaspi_proc_num(proc_num)
-    ccall((:gaspi_proc_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), proc_num)
+    @ccall libGPI2.gaspi_proc_num(proc_num::Ptr{gaspi_rank_t})::gaspi_return_t
 end
 
 """
@@ -329,7 +334,7 @@ gaspi_return_t gaspi_proc_kill (const gaspi_rank_t rank, const gaspi_timeout_t t
 ```
 """
 function gaspi_proc_kill(rank, timeout_ms)
-    ccall((:gaspi_proc_kill, get_gpi2_library()), gaspi_return_t, (gaspi_rank_t, gaspi_timeout_t), rank, timeout_ms)
+    @ccall libGPI2.gaspi_proc_kill(rank::gaspi_rank_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -348,7 +353,7 @@ gaspi_return_t gaspi_connect (const gaspi_rank_t rank, const gaspi_timeout_t tim
 ```
 """
 function gaspi_connect(rank, timeout_ms)
-    ccall((:gaspi_connect, get_gpi2_library()), gaspi_return_t, (gaspi_rank_t, gaspi_timeout_t), rank, timeout_ms)
+    @ccall libGPI2.gaspi_connect(rank::gaspi_rank_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -367,7 +372,7 @@ gaspi_return_t gaspi_disconnect (const gaspi_rank_t rank, const gaspi_timeout_t 
 ```
 """
 function gaspi_disconnect(rank, timeout_ms)
-    ccall((:gaspi_disconnect, get_gpi2_library()), gaspi_return_t, (gaspi_rank_t, gaspi_timeout_t), rank, timeout_ms)
+    @ccall libGPI2.gaspi_disconnect(rank::gaspi_rank_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 const gaspi_group_t = Cuchar
@@ -387,7 +392,7 @@ gaspi_return_t gaspi_group_create (gaspi_group_t * const group);
 ```
 """
 function gaspi_group_create(group)
-    ccall((:gaspi_group_create, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_group_t},), group)
+    @ccall libGPI2.gaspi_group_create(group::Ptr{gaspi_group_t})::gaspi_return_t
 end
 
 """
@@ -405,7 +410,7 @@ gaspi_return_t gaspi_group_delete (const gaspi_group_t group);
 ```
 """
 function gaspi_group_delete(group)
-    ccall((:gaspi_group_delete, get_gpi2_library()), gaspi_return_t, (gaspi_group_t,), group)
+    @ccall libGPI2.gaspi_group_delete(group::gaspi_group_t)::gaspi_return_t
 end
 
 """
@@ -424,7 +429,7 @@ gaspi_return_t gaspi_group_add (const gaspi_group_t group, const gaspi_rank_t ra
 ```
 """
 function gaspi_group_add(group, rank)
-    ccall((:gaspi_group_add, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, gaspi_rank_t), group, rank)
+    @ccall libGPI2.gaspi_group_add(group::gaspi_group_t, rank::gaspi_rank_t)::gaspi_return_t
 end
 
 """
@@ -443,7 +448,7 @@ gaspi_return_t gaspi_group_commit (const gaspi_group_t group, const gaspi_timeou
 ```
 """
 function gaspi_group_commit(group, timeout_ms)
-    ccall((:gaspi_group_commit, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, gaspi_timeout_t), group, timeout_ms)
+    @ccall libGPI2.gaspi_group_commit(group::gaspi_group_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -461,7 +466,7 @@ gaspi_return_t gaspi_group_num (gaspi_number_t * const group_num);
 ```
 """
 function gaspi_group_num(group_num)
-    ccall((:gaspi_group_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), group_num)
+    @ccall libGPI2.gaspi_group_num(group_num::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -480,7 +485,7 @@ gaspi_return_t gaspi_group_size (const gaspi_group_t group, gaspi_number_t * con
 ```
 """
 function gaspi_group_size(group, group_size)
-    ccall((:gaspi_group_size, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, Ptr{gaspi_number_t}), group, group_size)
+    @ccall libGPI2.gaspi_group_size(group::gaspi_group_t, group_size::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -499,7 +504,7 @@ gaspi_return_t gaspi_group_ranks (const gaspi_group_t group, gaspi_rank_t * cons
 ```
 """
 function gaspi_group_ranks(group, group_ranks)
-    ccall((:gaspi_group_ranks, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, Ptr{gaspi_rank_t}), group, group_ranks)
+    @ccall libGPI2.gaspi_group_ranks(group::gaspi_group_t, group_ranks::Ptr{gaspi_rank_t})::gaspi_return_t
 end
 
 """
@@ -517,7 +522,7 @@ gaspi_return_t gaspi_group_max (gaspi_number_t * const group_max);
 ```
 """
 function gaspi_group_max(group_max)
-    ccall((:gaspi_group_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), group_max)
+    @ccall libGPI2.gaspi_group_max(group_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 const gaspi_segment_id_t = Cuchar
@@ -550,7 +555,7 @@ gaspi_return_t gaspi_segment_alloc (const gaspi_segment_id_t segment_id, const g
 ```
 """
 function gaspi_segment_alloc(segment_id, size, alloc_policy)
-    ccall((:gaspi_segment_alloc, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_size_t, gaspi_alloc_t), segment_id, size, alloc_policy)
+    @ccall libGPI2.gaspi_segment_alloc(segment_id::gaspi_segment_id_t, size::gaspi_size_t, alloc_policy::gaspi_alloc_t)::gaspi_return_t
 end
 
 """
@@ -568,7 +573,7 @@ gaspi_return_t gaspi_segment_delete (const gaspi_segment_id_t segment_id);
 ```
 """
 function gaspi_segment_delete(segment_id)
-    ccall((:gaspi_segment_delete, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t,), segment_id)
+    @ccall libGPI2.gaspi_segment_delete(segment_id::gaspi_segment_id_t)::gaspi_return_t
 end
 
 """
@@ -588,7 +593,7 @@ gaspi_return_t gaspi_segment_register (const gaspi_segment_id_t segment_id, cons
 ```
 """
 function gaspi_segment_register(segment_id, rank, timeout_ms)
-    ccall((:gaspi_segment_register, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_rank_t, gaspi_timeout_t), segment_id, rank, timeout_ms)
+    @ccall libGPI2.gaspi_segment_register(segment_id::gaspi_segment_id_t, rank::gaspi_rank_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -610,7 +615,7 @@ gaspi_return_t gaspi_segment_create (const gaspi_segment_id_t segment_id, const 
 ```
 """
 function gaspi_segment_create(segment_id, size, group, timeout_ms, alloc_policy)
-    ccall((:gaspi_segment_create, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_size_t, gaspi_group_t, gaspi_timeout_t, gaspi_alloc_t), segment_id, size, group, timeout_ms, alloc_policy)
+    @ccall libGPI2.gaspi_segment_create(segment_id::gaspi_segment_id_t, size::gaspi_size_t, group::gaspi_group_t, timeout_ms::gaspi_timeout_t, alloc_policy::gaspi_alloc_t)::gaspi_return_t
 end
 
 const gaspi_pointer_t = Ptr{Cvoid}
@@ -635,7 +640,7 @@ gaspi_return_t gaspi_segment_bind (gaspi_segment_id_t const segment_id, gaspi_po
 ```
 """
 function gaspi_segment_bind(segment_id, pointer, size, memory_description)
-    ccall((:gaspi_segment_bind, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_pointer_t, gaspi_size_t, gaspi_memory_description_t), segment_id, pointer, size, memory_description)
+    @ccall libGPI2.gaspi_segment_bind(segment_id::gaspi_segment_id_t, pointer::gaspi_pointer_t, size::gaspi_size_t, memory_description::gaspi_memory_description_t)::gaspi_return_t
 end
 
 """
@@ -658,7 +663,7 @@ gaspi_return_t gaspi_segment_use (gaspi_segment_id_t const segment_id, gaspi_poi
 ```
 """
 function gaspi_segment_use(segment_id, pointer, size, group, timeout, memory_description)
-    ccall((:gaspi_segment_use, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_pointer_t, gaspi_size_t, gaspi_group_t, gaspi_timeout_t, gaspi_memory_description_t), segment_id, pointer, size, group, timeout, memory_description)
+    @ccall libGPI2.gaspi_segment_use(segment_id::gaspi_segment_id_t, pointer::gaspi_pointer_t, size::gaspi_size_t, group::gaspi_group_t, timeout::gaspi_timeout_t, memory_description::gaspi_memory_description_t)::gaspi_return_t
 end
 
 """
@@ -676,7 +681,7 @@ gaspi_return_t gaspi_segment_num (gaspi_number_t * const segment_num);
 ```
 """
 function gaspi_segment_num(segment_num)
-    ccall((:gaspi_segment_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), segment_num)
+    @ccall libGPI2.gaspi_segment_num(segment_num::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -695,7 +700,7 @@ gaspi_return_t gaspi_segment_list (const gaspi_number_t num, gaspi_segment_id_t 
 ```
 """
 function gaspi_segment_list(num, segment_id_list)
-    ccall((:gaspi_segment_list, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}), num, segment_id_list)
+    @ccall libGPI2.gaspi_segment_list(num::gaspi_number_t, segment_id_list::Ptr{gaspi_segment_id_t})::gaspi_return_t
 end
 
 """
@@ -714,7 +719,7 @@ gaspi_return_t gaspi_segment_ptr (const gaspi_segment_id_t segment_id, gaspi_poi
 ```
 """
 function gaspi_segment_ptr(segment_id, ptr)
-    ccall((:gaspi_segment_ptr, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, Ptr{gaspi_pointer_t}), segment_id, ptr)
+    @ccall libGPI2.gaspi_segment_ptr(segment_id::gaspi_segment_id_t, ptr::Ptr{gaspi_pointer_t})::gaspi_return_t
 end
 
 """
@@ -732,7 +737,7 @@ gaspi_return_t gaspi_segment_max (gaspi_number_t * const segment_max);
 ```
 """
 function gaspi_segment_max(segment_max)
-    ccall((:gaspi_segment_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), segment_max)
+    @ccall libGPI2.gaspi_segment_max(segment_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 const gaspi_offset_t = Culong
@@ -761,7 +766,7 @@ gaspi_return_t gaspi_write (const gaspi_segment_id_t segment_id_local, const gas
 ```
 """
 function gaspi_write(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
-    ccall((:gaspi_write, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    @ccall libGPI2.gaspi_write(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rank::gaspi_rank_t, segment_id_remote::gaspi_segment_id_t, offset_remote::gaspi_offset_t, size::gaspi_size_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -786,7 +791,7 @@ gaspi_return_t gaspi_read (const gaspi_segment_id_t segment_id_local, const gasp
 ```
 """
 function gaspi_read(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
-    ccall((:gaspi_read, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    @ccall libGPI2.gaspi_read(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rank::gaspi_rank_t, segment_id_remote::gaspi_segment_id_t, offset_remote::gaspi_offset_t, size::gaspi_size_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -812,7 +817,7 @@ gaspi_return_t gaspi_write_list (const gaspi_number_t num, gaspi_segment_id_t * 
 ```
 """
 function gaspi_write_list(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
-    ccall((:gaspi_write_list, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    @ccall libGPI2.gaspi_write_list(num::gaspi_number_t, segment_id_local::Ptr{gaspi_segment_id_t}, offset_local::Ptr{gaspi_offset_t}, rank::gaspi_rank_t, segment_id_remote::Ptr{gaspi_segment_id_t}, offset_remote::Ptr{gaspi_offset_t}, size::Ptr{gaspi_size_t}, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -838,7 +843,7 @@ gaspi_return_t gaspi_read_list (const gaspi_number_t num, gaspi_segment_id_t * c
 ```
 """
 function gaspi_read_list(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
-    ccall((:gaspi_read_list, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    @ccall libGPI2.gaspi_read_list(num::gaspi_number_t, segment_id_local::Ptr{gaspi_segment_id_t}, offset_local::Ptr{gaspi_offset_t}, rank::gaspi_rank_t, segment_id_remote::Ptr{gaspi_segment_id_t}, offset_remote::Ptr{gaspi_offset_t}, size::Ptr{gaspi_size_t}, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -857,7 +862,7 @@ gaspi_return_t gaspi_wait (const gaspi_queue_id_t queue, const gaspi_timeout_t t
 ```
 """
 function gaspi_wait(queue, timeout_ms)
-    ccall((:gaspi_wait, get_gpi2_library()), gaspi_return_t, (gaspi_queue_id_t, gaspi_timeout_t), queue, timeout_ms)
+    @ccall libGPI2.gaspi_wait(queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -876,7 +881,7 @@ gaspi_return_t gaspi_barrier (const gaspi_group_t group, const gaspi_timeout_t t
 ```
 """
 function gaspi_barrier(group, timeout_ms)
-    ccall((:gaspi_barrier, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, gaspi_timeout_t), group, timeout_ms)
+    @ccall libGPI2.gaspi_barrier(group::gaspi_group_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -931,7 +936,7 @@ gaspi_return_t gaspi_allreduce (const gaspi_pointer_t buffer_send, gaspi_pointer
 ```
 """
 function gaspi_allreduce(buffer_send, buffer_receive, num, operation, datatype, group, timeout_ms)
-    ccall((:gaspi_allreduce, get_gpi2_library()), gaspi_return_t, (gaspi_pointer_t, gaspi_pointer_t, gaspi_number_t, gaspi_operation_t, gaspi_datatype_t, gaspi_group_t, gaspi_timeout_t), buffer_send, buffer_receive, num, operation, datatype, group, timeout_ms)
+    @ccall libGPI2.gaspi_allreduce(buffer_send::gaspi_pointer_t, buffer_receive::gaspi_pointer_t, num::gaspi_number_t, operation::gaspi_operation_t, datatype::gaspi_datatype_t, group::gaspi_group_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 # typedef gaspi_return_t ( * gaspi_reduce_operation_t ) ( gaspi_pointer_t const operand_one , gaspi_pointer_t const operand_two , gaspi_pointer_t const result , gaspi_reduce_state_t const state , const gaspi_number_t num , const gaspi_size_t element_size , const gaspi_timeout_t timeout_ms )
@@ -948,7 +953,7 @@ gaspi_return_t gaspi_allreduce_user (const gaspi_pointer_t buffer_send, gaspi_po
 ```
 """
 function gaspi_allreduce_user(buffer_send, buffer_receive, num, element_size, reduce_operation, reduce_state, group, timeout_ms)
-    ccall((:gaspi_allreduce_user, get_gpi2_library()), gaspi_return_t, (gaspi_pointer_t, gaspi_pointer_t, gaspi_number_t, gaspi_size_t, gaspi_reduce_operation_t, gaspi_reduce_state_t, gaspi_group_t, gaspi_timeout_t), buffer_send, buffer_receive, num, element_size, reduce_operation, reduce_state, group, timeout_ms)
+    @ccall libGPI2.gaspi_allreduce_user(buffer_send::gaspi_pointer_t, buffer_receive::gaspi_pointer_t, num::gaspi_number_t, element_size::gaspi_size_t, reduce_operation::gaspi_reduce_operation_t, reduce_state::gaspi_reduce_state_t, group::gaspi_group_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 const gaspi_atomic_value_t = Culong
@@ -977,7 +982,7 @@ gaspi_return_t gaspi_atomic_fetch_add (const gaspi_segment_id_t segment_id, cons
 ```
 """
 function gaspi_atomic_fetch_add(segment_id, offset, rank, val_add, val_old, timeout_ms)
-    ccall((:gaspi_atomic_fetch_add, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_atomic_value_t, Ptr{gaspi_atomic_value_t}, gaspi_timeout_t), segment_id, offset, rank, val_add, val_old, timeout_ms)
+    @ccall libGPI2.gaspi_atomic_fetch_add(segment_id::gaspi_segment_id_t, offset::gaspi_offset_t, rank::gaspi_rank_t, val_add::gaspi_atomic_value_t, val_old::Ptr{gaspi_atomic_value_t}, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1001,7 +1006,7 @@ gaspi_return_t gaspi_atomic_compare_swap (const gaspi_segment_id_t segment_id, c
 ```
 """
 function gaspi_atomic_compare_swap(segment_id, offset, rank, comparator, val_new, val_old, timeout_ms)
-    ccall((:gaspi_atomic_compare_swap, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_atomic_value_t, gaspi_atomic_value_t, Ptr{gaspi_atomic_value_t}, gaspi_timeout_t), segment_id, offset, rank, comparator, val_new, val_old, timeout_ms)
+    @ccall libGPI2.gaspi_atomic_compare_swap(segment_id::gaspi_segment_id_t, offset::gaspi_offset_t, rank::gaspi_rank_t, comparator::gaspi_atomic_value_t, val_new::gaspi_atomic_value_t, val_old::Ptr{gaspi_atomic_value_t}, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1023,7 +1028,7 @@ gaspi_return_t gaspi_passive_send (const gaspi_segment_id_t segment_id_local, co
 ```
 """
 function gaspi_passive_send(segment_id_local, offset_local, rank, size, timeout_ms)
-    ccall((:gaspi_passive_send, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_size_t, gaspi_timeout_t), segment_id_local, offset_local, rank, size, timeout_ms)
+    @ccall libGPI2.gaspi_passive_send(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rank::gaspi_rank_t, size::gaspi_size_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1045,7 +1050,7 @@ gaspi_return_t gaspi_passive_receive (const gaspi_segment_id_t segment_id_local,
 ```
 """
 function gaspi_passive_receive(segment_id_local, offset_local, rem_rank, size, timeout_ms)
-    ccall((:gaspi_passive_receive, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, Ptr{gaspi_rank_t}, gaspi_size_t, gaspi_timeout_t), segment_id_local, offset_local, rem_rank, size, timeout_ms)
+    @ccall libGPI2.gaspi_passive_receive(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rem_rank::Ptr{gaspi_rank_t}, size::gaspi_size_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 const gaspi_notification_id_t = Cushort
@@ -1072,7 +1077,7 @@ gaspi_return_t gaspi_notify (const gaspi_segment_id_t segment_id_remote, const g
 ```
 """
 function gaspi_notify(segment_id_remote, rank, notification_id, notification_value, queue, timeout_ms)
-    ccall((:gaspi_notify, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_rank_t, gaspi_notification_id_t, gaspi_notification_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_remote, rank, notification_id, notification_value, queue, timeout_ms)
+    @ccall libGPI2.gaspi_notify(segment_id_remote::gaspi_segment_id_t, rank::gaspi_rank_t, notification_id::gaspi_notification_id_t, notification_value::gaspi_notification_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1094,7 +1099,7 @@ gaspi_return_t gaspi_notify_waitsome (const gaspi_segment_id_t segment_id_local,
 ```
 """
 function gaspi_notify_waitsome(segment_id_local, notification_begin, num, first_id, timeout_ms)
-    ccall((:gaspi_notify_waitsome, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_notification_id_t, gaspi_number_t, Ptr{gaspi_notification_id_t}, gaspi_timeout_t), segment_id_local, notification_begin, num, first_id, timeout_ms)
+    @ccall libGPI2.gaspi_notify_waitsome(segment_id_local::gaspi_segment_id_t, notification_begin::gaspi_notification_id_t, num::gaspi_number_t, first_id::Ptr{gaspi_notification_id_t}, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1114,7 +1119,7 @@ gaspi_return_t gaspi_notify_reset (const gaspi_segment_id_t segment_id_local, co
 ```
 """
 function gaspi_notify_reset(segment_id_local, notification_id, old_notification_val)
-    ccall((:gaspi_notify_reset, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_notification_id_t, Ptr{gaspi_notification_t}), segment_id_local, notification_id, old_notification_val)
+    @ccall libGPI2.gaspi_notify_reset(segment_id_local::gaspi_segment_id_t, notification_id::gaspi_notification_id_t, old_notification_val::Ptr{gaspi_notification_t})::gaspi_return_t
 end
 
 """
@@ -1141,7 +1146,7 @@ gaspi_return_t gaspi_write_notify (const gaspi_segment_id_t segment_id_local, co
 ```
 """
 function gaspi_write_notify(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, notification_value, queue, timeout_ms)
-    ccall((:gaspi_write_notify, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_notification_id_t, gaspi_notification_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, notification_value, queue, timeout_ms)
+    @ccall libGPI2.gaspi_write_notify(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rank::gaspi_rank_t, segment_id_remote::gaspi_segment_id_t, offset_remote::gaspi_offset_t, size::gaspi_size_t, notification_id::gaspi_notification_id_t, notification_value::gaspi_notification_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1170,7 +1175,7 @@ gaspi_return_t gaspi_write_list_notify (const gaspi_number_t num, gaspi_segment_
 ```
 """
 function gaspi_write_list_notify(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, notification_value, queue, timeout_ms)
-    ccall((:gaspi_write_list_notify, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_segment_id_t, gaspi_notification_id_t, gaspi_notification_t, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, notification_value, queue, timeout_ms)
+    @ccall libGPI2.gaspi_write_list_notify(num::gaspi_number_t, segment_id_local::Ptr{gaspi_segment_id_t}, offset_local::Ptr{gaspi_offset_t}, rank::gaspi_rank_t, segment_id_remote::Ptr{gaspi_segment_id_t}, offset_remote::Ptr{gaspi_offset_t}, size::Ptr{gaspi_size_t}, segment_id_notification::gaspi_segment_id_t, notification_id::gaspi_notification_id_t, notification_value::gaspi_notification_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1196,7 +1201,7 @@ gaspi_return_t gaspi_read_notify (const gaspi_segment_id_t segment_id_local, con
 ```
 """
 function gaspi_read_notify(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, queue, timeout_ms)
-    ccall((:gaspi_read_notify, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_notification_id_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, queue, timeout_ms)
+    @ccall libGPI2.gaspi_read_notify(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rank::gaspi_rank_t, segment_id_remote::gaspi_segment_id_t, offset_remote::gaspi_offset_t, size::gaspi_size_t, notification_id::gaspi_notification_id_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1224,7 +1229,7 @@ gaspi_return_t gaspi_read_list_notify (const gaspi_number_t num, gaspi_segment_i
 ```
 """
 function gaspi_read_list_notify(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, queue, timeout_ms)
-    ccall((:gaspi_read_list_notify, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_segment_id_t, gaspi_notification_id_t, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, queue, timeout_ms)
+    @ccall libGPI2.gaspi_read_list_notify(num::gaspi_number_t, segment_id_local::Ptr{gaspi_segment_id_t}, offset_local::Ptr{gaspi_offset_t}, rank::gaspi_rank_t, segment_id_remote::Ptr{gaspi_segment_id_t}, offset_remote::Ptr{gaspi_offset_t}, size::Ptr{gaspi_size_t}, segment_id_notification::gaspi_segment_id_t, notification_id::gaspi_notification_id_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1243,7 +1248,7 @@ gaspi_return_t pgaspi_queue_purge(const gaspi_queue_id_t queue, const gaspi_time
 ```
 """
 function pgaspi_queue_purge(queue, timeout_ms)
-    ccall((:pgaspi_queue_purge, get_gpi2_library()), gaspi_return_t, (gaspi_queue_id_t, gaspi_timeout_t), queue, timeout_ms)
+    @ccall libGPI2.pgaspi_queue_purge(queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1262,7 +1267,7 @@ gaspi_return_t gaspi_queue_size (const gaspi_queue_id_t queue, gaspi_number_t * 
 ```
 """
 function gaspi_queue_size(queue, queue_size)
-    ccall((:gaspi_queue_size, get_gpi2_library()), gaspi_return_t, (gaspi_queue_id_t, Ptr{gaspi_number_t}), queue, queue_size)
+    @ccall libGPI2.gaspi_queue_size(queue::gaspi_queue_id_t, queue_size::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -1280,7 +1285,7 @@ gaspi_return_t gaspi_queue_num (gaspi_number_t * const queue_num);
 ```
 """
 function gaspi_queue_num(queue_num)
-    ccall((:gaspi_queue_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), queue_num)
+    @ccall libGPI2.gaspi_queue_num(queue_num::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -1298,7 +1303,7 @@ gaspi_return_t gaspi_queue_size_max (gaspi_number_t * const queue_size_max);
 ```
 """
 function gaspi_queue_size_max(queue_size_max)
-    ccall((:gaspi_queue_size_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), queue_size_max)
+    @ccall libGPI2.gaspi_queue_size_max(queue_size_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -1317,7 +1322,7 @@ gaspi_return_t gaspi_queue_create(gaspi_queue_id_t * const queue, const gaspi_ti
 ```
 """
 function gaspi_queue_create(queue, timeout_ms)
-    ccall((:gaspi_queue_create, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_queue_id_t}, gaspi_timeout_t), queue, timeout_ms)
+    @ccall libGPI2.gaspi_queue_create(queue::Ptr{gaspi_queue_id_t}, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1335,7 +1340,7 @@ gaspi_return_t gaspi_queue_delete(const gaspi_queue_id_t queue);
 ```
 """
 function gaspi_queue_delete(queue)
-    ccall((:gaspi_queue_delete, get_gpi2_library()), gaspi_return_t, (gaspi_queue_id_t,), queue)
+    @ccall libGPI2.gaspi_queue_delete(queue::gaspi_queue_id_t)::gaspi_return_t
 end
 
 """
@@ -1353,7 +1358,7 @@ gaspi_return_t gaspi_transfer_size_min (gaspi_size_t * const transfer_size_min);
 ```
 """
 function gaspi_transfer_size_min(transfer_size_min)
-    ccall((:gaspi_transfer_size_min, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), transfer_size_min)
+    @ccall libGPI2.gaspi_transfer_size_min(transfer_size_min::Ptr{gaspi_size_t})::gaspi_return_t
 end
 
 """
@@ -1371,7 +1376,7 @@ gaspi_return_t gaspi_transfer_size_max (gaspi_size_t * const transfer_size_max);
 ```
 """
 function gaspi_transfer_size_max(transfer_size_max)
-    ccall((:gaspi_transfer_size_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), transfer_size_max)
+    @ccall libGPI2.gaspi_transfer_size_max(transfer_size_max::Ptr{gaspi_size_t})::gaspi_return_t
 end
 
 """
@@ -1389,7 +1394,7 @@ gaspi_return_t gaspi_notification_num (gaspi_number_t * const notification_num);
 ```
 """
 function gaspi_notification_num(notification_num)
-    ccall((:gaspi_notification_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), notification_num)
+    @ccall libGPI2.gaspi_notification_num(notification_num::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -1407,7 +1412,7 @@ gaspi_return_t gaspi_passive_transfer_size_min (gaspi_size_t * const passive_tra
 ```
 """
 function gaspi_passive_transfer_size_min(passive_transfer_size_min)
-    ccall((:gaspi_passive_transfer_size_min, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), passive_transfer_size_min)
+    @ccall libGPI2.gaspi_passive_transfer_size_min(passive_transfer_size_min::Ptr{gaspi_size_t})::gaspi_return_t
 end
 
 """
@@ -1425,7 +1430,7 @@ gaspi_return_t gaspi_passive_transfer_size_max (gaspi_size_t * const passive_tra
 ```
 """
 function gaspi_passive_transfer_size_max(passive_transfer_size_max)
-    ccall((:gaspi_passive_transfer_size_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), passive_transfer_size_max)
+    @ccall libGPI2.gaspi_passive_transfer_size_max(passive_transfer_size_max::Ptr{gaspi_size_t})::gaspi_return_t
 end
 
 """
@@ -1443,7 +1448,7 @@ gaspi_return_t gaspi_atomic_max(gaspi_atomic_value_t *max_value);
 ```
 """
 function gaspi_atomic_max(max_value)
-    ccall((:gaspi_atomic_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_atomic_value_t},), max_value)
+    @ccall libGPI2.gaspi_atomic_max(max_value::Ptr{gaspi_atomic_value_t})::gaspi_return_t
 end
 
 """
@@ -1461,7 +1466,7 @@ gaspi_return_t gaspi_allreduce_buf_size (gaspi_size_t * const buf_size);
 ```
 """
 function gaspi_allreduce_buf_size(buf_size)
-    ccall((:gaspi_allreduce_buf_size, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), buf_size)
+    @ccall libGPI2.gaspi_allreduce_buf_size(buf_size::Ptr{gaspi_size_t})::gaspi_return_t
 end
 
 """
@@ -1479,7 +1484,7 @@ gaspi_return_t gaspi_allreduce_elem_max (gaspi_number_t * const elem_max);
 ```
 """
 function gaspi_allreduce_elem_max(elem_max)
-    ccall((:gaspi_allreduce_elem_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), elem_max)
+    @ccall libGPI2.gaspi_allreduce_elem_max(elem_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -1497,7 +1502,7 @@ gaspi_return_t gaspi_queue_max(gaspi_number_t * const queue_max);
 ```
 """
 function gaspi_queue_max(queue_max)
-    ccall((:gaspi_queue_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), queue_max)
+    @ccall libGPI2.gaspi_queue_max(queue_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -1515,7 +1520,7 @@ gaspi_return_t gaspi_network_type (gaspi_network_t * const network_type);
 ```
 """
 function gaspi_network_type(network_type)
-    ccall((:gaspi_network_type, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_network_t},), network_type)
+    @ccall libGPI2.gaspi_network_type(network_type::Ptr{gaspi_network_t})::gaspi_return_t
 end
 
 """
@@ -1533,7 +1538,7 @@ gaspi_return_t gaspi_build_infrastructure (gaspi_number_t * const build);
 ```
 """
 function gaspi_build_infrastructure(build)
-    ccall((:gaspi_build_infrastructure, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), build)
+    @ccall libGPI2.gaspi_build_infrastructure(build::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 const gaspi_cycles_t = Culong
@@ -1553,7 +1558,7 @@ gaspi_return_t gaspi_time_ticks (gaspi_cycles_t * const ticks);
 ```
 """
 function gaspi_time_ticks(ticks)
-    ccall((:gaspi_time_ticks, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_cycles_t},), ticks)
+    @ccall libGPI2.gaspi_time_ticks(ticks::Ptr{gaspi_cycles_t})::gaspi_return_t
 end
 
 const gaspi_time_t = Cfloat
@@ -1573,7 +1578,7 @@ gaspi_return_t gaspi_time_get (gaspi_time_t * const wtime);
 ```
 """
 function gaspi_time_get(wtime)
-    ccall((:gaspi_time_get, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_time_t},), wtime)
+    @ccall libGPI2.gaspi_time_get(wtime::Ptr{gaspi_time_t})::gaspi_return_t
 end
 
 const gaspi_string_t = Cstring
@@ -1594,7 +1599,7 @@ gaspi_return_t gaspi_print_error( gaspi_return_t error_code, gaspi_string_t *err
 ```
 """
 function gaspi_print_error(error_code, error_message)
-    ccall((:gaspi_print_error, get_gpi2_library()), gaspi_return_t, (gaspi_return_t, Ptr{gaspi_string_t}), error_code, error_message)
+    @ccall libGPI2.gaspi_print_error(error_code::gaspi_return_t, error_message::Ptr{gaspi_string_t})::gaspi_return_t
 end
 
 """
@@ -1624,7 +1629,7 @@ gaspi_return_t gaspi_state_vec_get (gaspi_state_vector_t state_vector);
 ```
 """
 function gaspi_state_vec_get(state_vector)
-    ccall((:gaspi_state_vec_get, get_gpi2_library()), gaspi_return_t, (gaspi_state_vector_t,), state_vector)
+    @ccall libGPI2.gaspi_state_vec_get(state_vector::gaspi_state_vector_t)::gaspi_return_t
 end
 
 """
@@ -1642,7 +1647,7 @@ gaspi_return_t gaspi_statistic_verbosity_level(gaspi_number_t _verbosity_level);
 ```
 """
 function gaspi_statistic_verbosity_level(_verbosity_level)
-    ccall((:gaspi_statistic_verbosity_level, get_gpi2_library()), gaspi_return_t, (gaspi_number_t,), _verbosity_level)
+    @ccall libGPI2.gaspi_statistic_verbosity_level(_verbosity_level::gaspi_number_t)::gaspi_return_t
 end
 
 """
@@ -1660,7 +1665,7 @@ gaspi_return_t gaspi_statistic_counter_max(gaspi_number_t* counter_max);
 ```
 """
 function gaspi_statistic_counter_max(counter_max)
-    ccall((:gaspi_statistic_counter_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), counter_max)
+    @ccall libGPI2.gaspi_statistic_counter_max(counter_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 const gaspi_statistic_counter_t = Cuint
@@ -1694,7 +1699,7 @@ gaspi_return_t gaspi_statistic_counter_info( gaspi_statistic_counter_t counter, 
 ```
 """
 function gaspi_statistic_counter_info(counter, counter_argument, counter_name, counter_description, verbosity_level)
-    ccall((:gaspi_statistic_counter_info, get_gpi2_library()), gaspi_return_t, (gaspi_statistic_counter_t, Ptr{gaspi_statistic_argument_t}, Ptr{gaspi_string_t}, Ptr{gaspi_string_t}, Ptr{gaspi_number_t}), counter, counter_argument, counter_name, counter_description, verbosity_level)
+    @ccall libGPI2.gaspi_statistic_counter_info(counter::gaspi_statistic_counter_t, counter_argument::Ptr{gaspi_statistic_argument_t}, counter_name::Ptr{gaspi_string_t}, counter_description::Ptr{gaspi_string_t}, verbosity_level::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -1714,7 +1719,7 @@ gaspi_return_t gaspi_statistic_counter_get ( gaspi_statistic_counter_t counter, 
 ```
 """
 function gaspi_statistic_counter_get(counter, argument, value)
-    ccall((:gaspi_statistic_counter_get, get_gpi2_library()), gaspi_return_t, (gaspi_statistic_counter_t, gaspi_number_t, Ptr{Culong}), counter, argument, value)
+    @ccall libGPI2.gaspi_statistic_counter_get(counter::gaspi_statistic_counter_t, argument::gaspi_number_t, value::Ptr{Culong})::gaspi_return_t
 end
 
 """
@@ -1732,7 +1737,7 @@ gaspi_return_t gaspi_statistic_counter_reset (gaspi_statistic_counter_t counter)
 ```
 """
 function gaspi_statistic_counter_reset(counter)
-    ccall((:gaspi_statistic_counter_reset, get_gpi2_library()), gaspi_return_t, (gaspi_statistic_counter_t,), counter)
+    @ccall libGPI2.gaspi_statistic_counter_reset(counter::gaspi_statistic_counter_t)::gaspi_return_t
 end
 
 const gaspi_char = Cchar
@@ -1766,7 +1771,7 @@ gaspi_return_t gaspi_initialized (gaspi_number_t * initialized);
 ```
 """
 function gaspi_initialized(initialized)
-    ccall((:gaspi_initialized, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), initialized)
+    @ccall libGPI2.gaspi_initialized(initialized::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -1784,7 +1789,7 @@ gaspi_return_t gaspi_proc_local_rank (gaspi_rank_t * const local_rank);
 ```
 """
 function gaspi_proc_local_rank(local_rank)
-    ccall((:gaspi_proc_local_rank, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), local_rank)
+    @ccall libGPI2.gaspi_proc_local_rank(local_rank::Ptr{gaspi_rank_t})::gaspi_return_t
 end
 
 """
@@ -1802,7 +1807,7 @@ gaspi_return_t gaspi_proc_local_num (gaspi_rank_t * const local_num);
 ```
 """
 function gaspi_proc_local_num(local_num)
-    ccall((:gaspi_proc_local_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), local_num)
+    @ccall libGPI2.gaspi_proc_local_num(local_num::Ptr{gaspi_rank_t})::gaspi_return_t
 end
 
 """
@@ -1820,8 +1825,18 @@ gaspi_return_t gaspi_cpu_frequency (gaspi_float * const cpu_mhz);
 ```
 """
 function gaspi_cpu_frequency(cpu_mhz)
-    ccall((:gaspi_cpu_frequency, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_float},), cpu_mhz)
+    @ccall libGPI2.gaspi_cpu_frequency(cpu_mhz::Ptr{gaspi_float})::gaspi_return_t
 end
+
+# automatic type deduction for variadic arguments may not be what you want, please use with caution
+@generated function gaspi_printf(fmt, va_list...)
+        :(@ccall(libGPI2.gaspi_printf(fmt::Cstring; $(to_c_type_pairs(va_list)...))::Cvoid))
+    end
+
+# automatic type deduction for variadic arguments may not be what you want, please use with caution
+@generated function gaspi_printf_to(rank, fmt, va_list...)
+        :(@ccall(libGPI2.gaspi_printf_to(rank::gaspi_rank_t, fmt::Cstring; $(to_c_type_pairs(va_list)...))::Cvoid))
+    end
 
 """
     gaspi_print_affinity_mask()
@@ -1834,7 +1849,7 @@ void gaspi_print_affinity_mask (void);
 ```
 """
 function gaspi_print_affinity_mask()
-    ccall((:gaspi_print_affinity_mask, get_gpi2_library()), Cvoid, ())
+    @ccall libGPI2.gaspi_print_affinity_mask()::Cvoid
 end
 
 """
@@ -1852,7 +1867,7 @@ gaspi_return_t gaspi_numa_socket(gaspi_uchar * const socket);
 ```
 """
 function gaspi_numa_socket(socket)
-    ccall((:gaspi_numa_socket, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_uchar},), socket)
+    @ccall libGPI2.gaspi_numa_socket(socket::Ptr{gaspi_uchar})::gaspi_return_t
 end
 
 """
@@ -1866,7 +1881,7 @@ gaspi_return_t gaspi_set_socket_affinity (const gaspi_uchar socket);
 ```
 """
 function gaspi_set_socket_affinity(socket)
-    ccall((:gaspi_set_socket_affinity, get_gpi2_library()), gaspi_return_t, (gaspi_uchar,), socket)
+    @ccall libGPI2.gaspi_set_socket_affinity(socket::gaspi_uchar)::gaspi_return_t
 end
 
 """
@@ -1884,7 +1899,7 @@ gaspi_string_t gaspi_error_str(gaspi_return_t error_code);
 ```
 """
 function gaspi_error_str(error_code)
-    ccall((:gaspi_error_str, get_gpi2_library()), gaspi_string_t, (gaspi_return_t,), error_code)
+    @ccall libGPI2.gaspi_error_str(error_code::gaspi_return_t)::gaspi_string_t
 end
 
 """
@@ -1903,7 +1918,7 @@ gaspi_return_t gaspi_proc_ping (const gaspi_rank_t rank, gaspi_timeout_t tout);
 ```
 """
 function gaspi_proc_ping(rank, tout)
-    ccall((:gaspi_proc_ping, get_gpi2_library()), gaspi_return_t, (gaspi_rank_t, gaspi_timeout_t), rank, tout)
+    @ccall libGPI2.gaspi_proc_ping(rank::gaspi_rank_t, tout::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -1923,7 +1938,7 @@ gaspi_return_t gaspi_segment_avail_local (gaspi_segment_id_t* const avail_seg_id
 ```
 """
 function gaspi_segment_avail_local(avail_seg_id)
-    ccall((:gaspi_segment_avail_local, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_segment_id_t},), avail_seg_id)
+    @ccall libGPI2.gaspi_segment_avail_local(avail_seg_id::Ptr{gaspi_segment_id_t})::gaspi_return_t
 end
 
 """
@@ -1943,7 +1958,7 @@ gaspi_return_t gaspi_segment_size (const gaspi_segment_id_t segment_id, const ga
 ```
 """
 function gaspi_segment_size(segment_id, rank, size)
-    ccall((:gaspi_segment_size, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_rank_t, Ptr{gaspi_size_t}), segment_id, rank, size)
+    @ccall libGPI2.gaspi_segment_size(segment_id::gaspi_segment_id_t, rank::gaspi_rank_t, size::Ptr{gaspi_size_t})::gaspi_return_t
 end
 
 """
@@ -1961,7 +1976,7 @@ gaspi_return_t gaspi_rw_list_elem_max (gaspi_number_t * const elem_max);
 ```
 """
 function gaspi_rw_list_elem_max(elem_max)
-    ccall((:gaspi_rw_list_elem_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), elem_max)
+    @ccall libGPI2.gaspi_rw_list_elem_max(elem_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -1979,7 +1994,7 @@ gaspi_return_t gaspi_threads_get_tid(gaspi_int * const tid) __attribute__ ((depr
 ```
 """
 function gaspi_threads_get_tid(tid)
-    ccall((:gaspi_threads_get_tid, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_int},), tid)
+    @ccall libGPI2.gaspi_threads_get_tid(tid::Ptr{gaspi_int})::gaspi_return_t
 end
 
 """
@@ -1997,7 +2012,7 @@ gaspi_return_t gaspi_threads_get_total(gaspi_int *const num) __attribute__ ((dep
 ```
 """
 function gaspi_threads_get_total(num)
-    ccall((:gaspi_threads_get_total, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_int},), num)
+    @ccall libGPI2.gaspi_threads_get_total(num::Ptr{gaspi_int})::gaspi_return_t
 end
 
 """
@@ -2015,7 +2030,7 @@ gaspi_return_t gaspi_threads_get_num_cores(gaspi_int * const cores) __attribute_
 ```
 """
 function gaspi_threads_get_num_cores(cores)
-    ccall((:gaspi_threads_get_num_cores, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_int},), cores)
+    @ccall libGPI2.gaspi_threads_get_num_cores(cores::Ptr{gaspi_int})::gaspi_return_t
 end
 
 """
@@ -2031,7 +2046,7 @@ gaspi_return_t gaspi_threads_init(gaspi_int * const num) __attribute__ ((depreca
 ```
 """
 function gaspi_threads_init(num)
-    ccall((:gaspi_threads_init, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_int},), num)
+    @ccall libGPI2.gaspi_threads_init(num::Ptr{gaspi_int})::gaspi_return_t
 end
 
 """
@@ -2049,7 +2064,7 @@ gaspi_return_t gaspi_threads_init_user(const unsigned int use_nr_of_threads) __a
 ```
 """
 function gaspi_threads_init_user(use_nr_of_threads)
-    ccall((:gaspi_threads_init_user, get_gpi2_library()), gaspi_return_t, (Cuint,), use_nr_of_threads)
+    @ccall libGPI2.gaspi_threads_init_user(use_nr_of_threads::Cuint)::gaspi_return_t
 end
 
 """
@@ -2065,7 +2080,7 @@ gaspi_return_t gaspi_threads_term(void) __attribute__ ((deprecated));
 ```
 """
 function gaspi_threads_term()
-    ccall((:gaspi_threads_term, get_gpi2_library()), gaspi_return_t, ())
+    @ccall libGPI2.gaspi_threads_term()::gaspi_return_t
 end
 
 """
@@ -2084,7 +2099,7 @@ gaspi_return_t gaspi_threads_run(void* (*function)(void*), void *arg) __attribut
 ```
 """
 function gaspi_threads_run(_function, arg)
-    ccall((:gaspi_threads_run, get_gpi2_library()), gaspi_return_t, (Ptr{Cvoid}, Ptr{Cvoid}), _function, arg)
+    @ccall libGPI2.gaspi_threads_run(_function::Ptr{Cvoid}, arg::Ptr{Cvoid})::gaspi_return_t
 end
 
 """
@@ -2102,7 +2117,7 @@ gaspi_return_t gaspi_threads_register(gaspi_int * tid);
 ```
 """
 function gaspi_threads_register(tid)
-    ccall((:gaspi_threads_register, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_int},), tid)
+    @ccall libGPI2.gaspi_threads_register(tid::Ptr{gaspi_int})::gaspi_return_t
 end
 
 """
@@ -2116,7 +2131,7 @@ void gaspi_threads_sync(void);
 ```
 """
 function gaspi_threads_sync()
-    ccall((:gaspi_threads_sync, get_gpi2_library()), Cvoid, ())
+    @ccall libGPI2.gaspi_threads_sync()::Cvoid
 end
 
 """
@@ -2135,7 +2150,7 @@ gaspi_return_t gaspi_threads_sync_all(const gaspi_group_t g, const gaspi_timeout
 ```
 """
 function gaspi_threads_sync_all(g, timeout_ms)
-    ccall((:gaspi_threads_sync_all, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, gaspi_timeout_t), g, timeout_ms)
+    @ccall libGPI2.gaspi_threads_sync_all(g::gaspi_group_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2147,7 +2162,7 @@ gaspi_return_t pgaspi_config_get (gaspi_config_t * const config);
 ```
 """
 function pgaspi_config_get(config)
-    ccall((:pgaspi_config_get, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_config_t},), config)
+    @ccall libGPI2.pgaspi_config_get(config::Ptr{gaspi_config_t})::gaspi_return_t
 end
 
 """
@@ -2159,7 +2174,7 @@ gaspi_return_t pgaspi_config_set (const gaspi_config_t new_config);
 ```
 """
 function pgaspi_config_set(new_config)
-    ccall((:pgaspi_config_set, get_gpi2_library()), gaspi_return_t, (gaspi_config_t,), new_config)
+    @ccall libGPI2.pgaspi_config_set(new_config::gaspi_config_t)::gaspi_return_t
 end
 
 """
@@ -2171,7 +2186,7 @@ gaspi_return_t pgaspi_version (float *version);
 ```
 """
 function pgaspi_version(version)
-    ccall((:pgaspi_version, get_gpi2_library()), gaspi_return_t, (Ptr{Cfloat},), version)
+    @ccall libGPI2.pgaspi_version(version::Ptr{Cfloat})::gaspi_return_t
 end
 
 """
@@ -2183,7 +2198,7 @@ gaspi_return_t pgaspi_proc_init (const gaspi_timeout_t timeout_ms);
 ```
 """
 function pgaspi_proc_init(timeout_ms)
-    ccall((:pgaspi_proc_init, get_gpi2_library()), gaspi_return_t, (gaspi_timeout_t,), timeout_ms)
+    @ccall libGPI2.pgaspi_proc_init(timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2195,7 +2210,7 @@ gaspi_return_t pgaspi_initialized (gaspi_number_t * initialized);
 ```
 """
 function pgaspi_initialized(initialized)
-    ccall((:pgaspi_initialized, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), initialized)
+    @ccall libGPI2.pgaspi_initialized(initialized::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2207,7 +2222,7 @@ gaspi_return_t pgaspi_proc_term (const gaspi_timeout_t timeout_ms);
 ```
 """
 function pgaspi_proc_term(timeout_ms)
-    ccall((:pgaspi_proc_term, get_gpi2_library()), gaspi_return_t, (gaspi_timeout_t,), timeout_ms)
+    @ccall libGPI2.pgaspi_proc_term(timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2219,7 +2234,7 @@ gaspi_return_t pgaspi_proc_local_rank (gaspi_rank_t * const local_rank);
 ```
 """
 function pgaspi_proc_local_rank(local_rank)
-    ccall((:pgaspi_proc_local_rank, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), local_rank)
+    @ccall libGPI2.pgaspi_proc_local_rank(local_rank::Ptr{gaspi_rank_t})::gaspi_return_t
 end
 
 """
@@ -2231,7 +2246,7 @@ gaspi_return_t pgaspi_proc_local_num (gaspi_rank_t * const local_num);
 ```
 """
 function pgaspi_proc_local_num(local_num)
-    ccall((:pgaspi_proc_local_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), local_num)
+    @ccall libGPI2.pgaspi_proc_local_num(local_num::Ptr{gaspi_rank_t})::gaspi_return_t
 end
 
 """
@@ -2243,7 +2258,7 @@ gaspi_return_t pgaspi_proc_rank (gaspi_rank_t * const rank);
 ```
 """
 function pgaspi_proc_rank(rank)
-    ccall((:pgaspi_proc_rank, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), rank)
+    @ccall libGPI2.pgaspi_proc_rank(rank::Ptr{gaspi_rank_t})::gaspi_return_t
 end
 
 """
@@ -2255,7 +2270,7 @@ gaspi_return_t pgaspi_proc_num (gaspi_rank_t * const proc_num);
 ```
 """
 function pgaspi_proc_num(proc_num)
-    ccall((:pgaspi_proc_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_rank_t},), proc_num)
+    @ccall libGPI2.pgaspi_proc_num(proc_num::Ptr{gaspi_rank_t})::gaspi_return_t
 end
 
 """
@@ -2267,7 +2282,7 @@ gaspi_return_t pgaspi_proc_kill (const gaspi_rank_t rank, const gaspi_timeout_t 
 ```
 """
 function pgaspi_proc_kill(rank, timeout_ms)
-    ccall((:pgaspi_proc_kill, get_gpi2_library()), gaspi_return_t, (gaspi_rank_t, gaspi_timeout_t), rank, timeout_ms)
+    @ccall libGPI2.pgaspi_proc_kill(rank::gaspi_rank_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2279,7 +2294,7 @@ gaspi_return_t pgaspi_connect (const gaspi_rank_t rank, const gaspi_timeout_t ti
 ```
 """
 function pgaspi_connect(rank, timeout_ms)
-    ccall((:pgaspi_connect, get_gpi2_library()), gaspi_return_t, (gaspi_rank_t, gaspi_timeout_t), rank, timeout_ms)
+    @ccall libGPI2.pgaspi_connect(rank::gaspi_rank_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2291,7 +2306,7 @@ gaspi_return_t pgaspi_disconnect (const gaspi_rank_t rank, const gaspi_timeout_t
 ```
 """
 function pgaspi_disconnect(rank, timeout_ms)
-    ccall((:pgaspi_disconnect, get_gpi2_library()), gaspi_return_t, (gaspi_rank_t, gaspi_timeout_t), rank, timeout_ms)
+    @ccall libGPI2.pgaspi_disconnect(rank::gaspi_rank_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2303,7 +2318,7 @@ gaspi_return_t pgaspi_group_create (gaspi_group_t * const group);
 ```
 """
 function pgaspi_group_create(group)
-    ccall((:pgaspi_group_create, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_group_t},), group)
+    @ccall libGPI2.pgaspi_group_create(group::Ptr{gaspi_group_t})::gaspi_return_t
 end
 
 """
@@ -2315,7 +2330,7 @@ gaspi_return_t pgaspi_group_delete (const gaspi_group_t group);
 ```
 """
 function pgaspi_group_delete(group)
-    ccall((:pgaspi_group_delete, get_gpi2_library()), gaspi_return_t, (gaspi_group_t,), group)
+    @ccall libGPI2.pgaspi_group_delete(group::gaspi_group_t)::gaspi_return_t
 end
 
 """
@@ -2327,7 +2342,7 @@ gaspi_return_t pgaspi_group_add (const gaspi_group_t group, const gaspi_rank_t r
 ```
 """
 function pgaspi_group_add(group, rank)
-    ccall((:pgaspi_group_add, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, gaspi_rank_t), group, rank)
+    @ccall libGPI2.pgaspi_group_add(group::gaspi_group_t, rank::gaspi_rank_t)::gaspi_return_t
 end
 
 """
@@ -2339,7 +2354,7 @@ gaspi_return_t pgaspi_group_commit (const gaspi_group_t group, const gaspi_timeo
 ```
 """
 function pgaspi_group_commit(group, timeout_ms)
-    ccall((:pgaspi_group_commit, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, gaspi_timeout_t), group, timeout_ms)
+    @ccall libGPI2.pgaspi_group_commit(group::gaspi_group_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2351,7 +2366,7 @@ gaspi_return_t pgaspi_group_num (gaspi_number_t * const group_num);
 ```
 """
 function pgaspi_group_num(group_num)
-    ccall((:pgaspi_group_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), group_num)
+    @ccall libGPI2.pgaspi_group_num(group_num::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2363,7 +2378,7 @@ gaspi_return_t pgaspi_group_size (const gaspi_group_t group, gaspi_number_t * co
 ```
 """
 function pgaspi_group_size(group, group_size)
-    ccall((:pgaspi_group_size, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, Ptr{gaspi_number_t}), group, group_size)
+    @ccall libGPI2.pgaspi_group_size(group::gaspi_group_t, group_size::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2375,7 +2390,7 @@ gaspi_return_t pgaspi_group_ranks (const gaspi_group_t group, gaspi_rank_t * con
 ```
 """
 function pgaspi_group_ranks(group, group_ranks)
-    ccall((:pgaspi_group_ranks, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, Ptr{gaspi_rank_t}), group, group_ranks)
+    @ccall libGPI2.pgaspi_group_ranks(group::gaspi_group_t, group_ranks::Ptr{gaspi_rank_t})::gaspi_return_t
 end
 
 """
@@ -2387,7 +2402,7 @@ gaspi_return_t pgaspi_group_max (gaspi_number_t * const group_max);
 ```
 """
 function pgaspi_group_max(group_max)
-    ccall((:pgaspi_group_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), group_max)
+    @ccall libGPI2.pgaspi_group_max(group_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2399,7 +2414,7 @@ gaspi_return_t pgaspi_segment_alloc (const gaspi_segment_id_t segment_id, const 
 ```
 """
 function pgaspi_segment_alloc(segment_id, size, alloc_policy)
-    ccall((:pgaspi_segment_alloc, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_size_t, gaspi_alloc_t), segment_id, size, alloc_policy)
+    @ccall libGPI2.pgaspi_segment_alloc(segment_id::gaspi_segment_id_t, size::gaspi_size_t, alloc_policy::gaspi_alloc_t)::gaspi_return_t
 end
 
 """
@@ -2411,7 +2426,7 @@ gaspi_return_t pgaspi_segment_delete (const gaspi_segment_id_t segment_id);
 ```
 """
 function pgaspi_segment_delete(segment_id)
-    ccall((:pgaspi_segment_delete, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t,), segment_id)
+    @ccall libGPI2.pgaspi_segment_delete(segment_id::gaspi_segment_id_t)::gaspi_return_t
 end
 
 """
@@ -2423,7 +2438,7 @@ gaspi_return_t pgaspi_segment_register (const gaspi_segment_id_t segment_id, con
 ```
 """
 function pgaspi_segment_register(segment_id, rank, timeout_ms)
-    ccall((:pgaspi_segment_register, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_rank_t, gaspi_timeout_t), segment_id, rank, timeout_ms)
+    @ccall libGPI2.pgaspi_segment_register(segment_id::gaspi_segment_id_t, rank::gaspi_rank_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2435,7 +2450,7 @@ gaspi_return_t pgaspi_segment_create (const gaspi_segment_id_t segment_id, const
 ```
 """
 function pgaspi_segment_create(segment_id, size, group, timeout_ms, alloc_policy)
-    ccall((:pgaspi_segment_create, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_size_t, gaspi_group_t, gaspi_timeout_t, gaspi_alloc_t), segment_id, size, group, timeout_ms, alloc_policy)
+    @ccall libGPI2.pgaspi_segment_create(segment_id::gaspi_segment_id_t, size::gaspi_size_t, group::gaspi_group_t, timeout_ms::gaspi_timeout_t, alloc_policy::gaspi_alloc_t)::gaspi_return_t
 end
 
 """
@@ -2447,7 +2462,7 @@ gaspi_return_t pgaspi_segment_bind ( gaspi_segment_id_t const segment_id, gaspi_
 ```
 """
 function pgaspi_segment_bind(segment_id, pointer, size, memory_description)
-    ccall((:pgaspi_segment_bind, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_pointer_t, gaspi_size_t, gaspi_memory_description_t), segment_id, pointer, size, memory_description)
+    @ccall libGPI2.pgaspi_segment_bind(segment_id::gaspi_segment_id_t, pointer::gaspi_pointer_t, size::gaspi_size_t, memory_description::gaspi_memory_description_t)::gaspi_return_t
 end
 
 """
@@ -2459,7 +2474,7 @@ gaspi_return_t pgaspi_segment_use ( gaspi_segment_id_t const segment_id, gaspi_p
 ```
 """
 function pgaspi_segment_use(segment_id, pointer, size, group, timeout, memory_description)
-    ccall((:pgaspi_segment_use, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_pointer_t, gaspi_size_t, gaspi_group_t, gaspi_timeout_t, gaspi_memory_description_t), segment_id, pointer, size, group, timeout, memory_description)
+    @ccall libGPI2.pgaspi_segment_use(segment_id::gaspi_segment_id_t, pointer::gaspi_pointer_t, size::gaspi_size_t, group::gaspi_group_t, timeout::gaspi_timeout_t, memory_description::gaspi_memory_description_t)::gaspi_return_t
 end
 
 """
@@ -2471,7 +2486,7 @@ gaspi_return_t pgaspi_segment_num (gaspi_number_t * const segment_num);
 ```
 """
 function pgaspi_segment_num(segment_num)
-    ccall((:pgaspi_segment_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), segment_num)
+    @ccall libGPI2.pgaspi_segment_num(segment_num::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2483,7 +2498,7 @@ gaspi_return_t pgaspi_segment_list (const gaspi_number_t num, gaspi_segment_id_t
 ```
 """
 function pgaspi_segment_list(num, segment_id_list)
-    ccall((:pgaspi_segment_list, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}), num, segment_id_list)
+    @ccall libGPI2.pgaspi_segment_list(num::gaspi_number_t, segment_id_list::Ptr{gaspi_segment_id_t})::gaspi_return_t
 end
 
 """
@@ -2495,7 +2510,7 @@ gaspi_return_t pgaspi_segment_ptr (const gaspi_segment_id_t segment_id, gaspi_po
 ```
 """
 function pgaspi_segment_ptr(segment_id, ptr)
-    ccall((:pgaspi_segment_ptr, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, Ptr{gaspi_pointer_t}), segment_id, ptr)
+    @ccall libGPI2.pgaspi_segment_ptr(segment_id::gaspi_segment_id_t, ptr::Ptr{gaspi_pointer_t})::gaspi_return_t
 end
 
 """
@@ -2507,7 +2522,7 @@ gaspi_return_t pgaspi_segment_size (const gaspi_segment_id_t segment_id, const g
 ```
 """
 function pgaspi_segment_size(segment_id, rank, size)
-    ccall((:pgaspi_segment_size, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_rank_t, Ptr{gaspi_size_t}), segment_id, rank, size)
+    @ccall libGPI2.pgaspi_segment_size(segment_id::gaspi_segment_id_t, rank::gaspi_rank_t, size::Ptr{gaspi_size_t})::gaspi_return_t
 end
 
 """
@@ -2519,7 +2534,7 @@ gaspi_return_t pgaspi_segment_max (gaspi_number_t * const segment_max);
 ```
 """
 function pgaspi_segment_max(segment_max)
-    ccall((:pgaspi_segment_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), segment_max)
+    @ccall libGPI2.pgaspi_segment_max(segment_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2531,7 +2546,7 @@ gaspi_return_t pgaspi_write (const gaspi_segment_id_t segment_id_local, const ga
 ```
 """
 function pgaspi_write(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
-    ccall((:pgaspi_write, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    @ccall libGPI2.pgaspi_write(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rank::gaspi_rank_t, segment_id_remote::gaspi_segment_id_t, offset_remote::gaspi_offset_t, size::gaspi_size_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2543,7 +2558,7 @@ gaspi_return_t pgaspi_read (const gaspi_segment_id_t segment_id_local, const gas
 ```
 """
 function pgaspi_read(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
-    ccall((:pgaspi_read, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    @ccall libGPI2.pgaspi_read(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rank::gaspi_rank_t, segment_id_remote::gaspi_segment_id_t, offset_remote::gaspi_offset_t, size::gaspi_size_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2555,7 +2570,7 @@ gaspi_return_t pgaspi_write_list (const gaspi_number_t num, gaspi_segment_id_t *
 ```
 """
 function pgaspi_write_list(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
-    ccall((:pgaspi_write_list, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    @ccall libGPI2.pgaspi_write_list(num::gaspi_number_t, segment_id_local::Ptr{gaspi_segment_id_t}, offset_local::Ptr{gaspi_offset_t}, rank::gaspi_rank_t, segment_id_remote::Ptr{gaspi_segment_id_t}, offset_remote::Ptr{gaspi_offset_t}, size::Ptr{gaspi_size_t}, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2567,7 +2582,7 @@ gaspi_return_t pgaspi_read_list (const gaspi_number_t num, gaspi_segment_id_t * 
 ```
 """
 function pgaspi_read_list(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
-    ccall((:pgaspi_read_list, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, queue, timeout_ms)
+    @ccall libGPI2.pgaspi_read_list(num::gaspi_number_t, segment_id_local::Ptr{gaspi_segment_id_t}, offset_local::Ptr{gaspi_offset_t}, rank::gaspi_rank_t, segment_id_remote::Ptr{gaspi_segment_id_t}, offset_remote::Ptr{gaspi_offset_t}, size::Ptr{gaspi_size_t}, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2579,7 +2594,7 @@ gaspi_return_t pgaspi_wait (const gaspi_queue_id_t queue, const gaspi_timeout_t 
 ```
 """
 function pgaspi_wait(queue, timeout_ms)
-    ccall((:pgaspi_wait, get_gpi2_library()), gaspi_return_t, (gaspi_queue_id_t, gaspi_timeout_t), queue, timeout_ms)
+    @ccall libGPI2.pgaspi_wait(queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2591,7 +2606,7 @@ gaspi_return_t pgaspi_barrier (const gaspi_group_t group, const gaspi_timeout_t 
 ```
 """
 function pgaspi_barrier(group, timeout_ms)
-    ccall((:pgaspi_barrier, get_gpi2_library()), gaspi_return_t, (gaspi_group_t, gaspi_timeout_t), group, timeout_ms)
+    @ccall libGPI2.pgaspi_barrier(group::gaspi_group_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2603,7 +2618,7 @@ gaspi_return_t pgaspi_allreduce (const gaspi_pointer_t buffer_send, gaspi_pointe
 ```
 """
 function pgaspi_allreduce(buffer_send, buffer_receive, num, operation, datatyp, group, timeout_ms)
-    ccall((:pgaspi_allreduce, get_gpi2_library()), gaspi_return_t, (gaspi_pointer_t, gaspi_pointer_t, gaspi_number_t, gaspi_operation_t, gaspi_datatype_t, gaspi_group_t, gaspi_timeout_t), buffer_send, buffer_receive, num, operation, datatyp, group, timeout_ms)
+    @ccall libGPI2.pgaspi_allreduce(buffer_send::gaspi_pointer_t, buffer_receive::gaspi_pointer_t, num::gaspi_number_t, operation::gaspi_operation_t, datatyp::gaspi_datatype_t, group::gaspi_group_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2615,7 +2630,7 @@ gaspi_return_t pgaspi_allreduce_user (const gaspi_pointer_t buffer_send, gaspi_p
 ```
 """
 function pgaspi_allreduce_user(buffer_send, buffer_receive, num, element_size, reduce_operation, reduce_state, group, timeout_ms)
-    ccall((:pgaspi_allreduce_user, get_gpi2_library()), gaspi_return_t, (gaspi_pointer_t, gaspi_pointer_t, gaspi_number_t, gaspi_size_t, gaspi_reduce_operation_t, gaspi_reduce_state_t, gaspi_group_t, gaspi_timeout_t), buffer_send, buffer_receive, num, element_size, reduce_operation, reduce_state, group, timeout_ms)
+    @ccall libGPI2.pgaspi_allreduce_user(buffer_send::gaspi_pointer_t, buffer_receive::gaspi_pointer_t, num::gaspi_number_t, element_size::gaspi_size_t, reduce_operation::gaspi_reduce_operation_t, reduce_state::gaspi_reduce_state_t, group::gaspi_group_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2627,7 +2642,7 @@ gaspi_return_t pgaspi_atomic_fetch_add (const gaspi_segment_id_t segment_id, con
 ```
 """
 function pgaspi_atomic_fetch_add(segment_id, offset, rank, val_add, val_old, timeout_ms)
-    ccall((:pgaspi_atomic_fetch_add, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_atomic_value_t, Ptr{gaspi_atomic_value_t}, gaspi_timeout_t), segment_id, offset, rank, val_add, val_old, timeout_ms)
+    @ccall libGPI2.pgaspi_atomic_fetch_add(segment_id::gaspi_segment_id_t, offset::gaspi_offset_t, rank::gaspi_rank_t, val_add::gaspi_atomic_value_t, val_old::Ptr{gaspi_atomic_value_t}, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2639,7 +2654,7 @@ gaspi_return_t pgaspi_atomic_compare_swap (const gaspi_segment_id_t segment_id, 
 ```
 """
 function pgaspi_atomic_compare_swap(segment_id, offset, rank, comparator, val_new, val_old, timeout_ms)
-    ccall((:pgaspi_atomic_compare_swap, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_atomic_value_t, gaspi_atomic_value_t, Ptr{gaspi_atomic_value_t}, gaspi_timeout_t), segment_id, offset, rank, comparator, val_new, val_old, timeout_ms)
+    @ccall libGPI2.pgaspi_atomic_compare_swap(segment_id::gaspi_segment_id_t, offset::gaspi_offset_t, rank::gaspi_rank_t, comparator::gaspi_atomic_value_t, val_new::gaspi_atomic_value_t, val_old::Ptr{gaspi_atomic_value_t}, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2651,7 +2666,7 @@ gaspi_return_t pgaspi_passive_send (const gaspi_segment_id_t segment_id_local, c
 ```
 """
 function pgaspi_passive_send(segment_id_local, offset_local, rank, size, timeout_ms)
-    ccall((:pgaspi_passive_send, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_size_t, gaspi_timeout_t), segment_id_local, offset_local, rank, size, timeout_ms)
+    @ccall libGPI2.pgaspi_passive_send(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rank::gaspi_rank_t, size::gaspi_size_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2663,7 +2678,7 @@ gaspi_return_t pgaspi_passive_receive (const gaspi_segment_id_t segment_id_local
 ```
 """
 function pgaspi_passive_receive(segment_id_local, offset_local, rem_rank, size, timeout_ms)
-    ccall((:pgaspi_passive_receive, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, Ptr{gaspi_rank_t}, gaspi_size_t, gaspi_timeout_t), segment_id_local, offset_local, rem_rank, size, timeout_ms)
+    @ccall libGPI2.pgaspi_passive_receive(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rem_rank::Ptr{gaspi_rank_t}, size::gaspi_size_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2675,7 +2690,7 @@ gaspi_return_t pgaspi_notify (const gaspi_segment_id_t segment_id_remote, const 
 ```
 """
 function pgaspi_notify(segment_id_remote, rank, notification_id, notification_value, queue, timeout_ms)
-    ccall((:pgaspi_notify, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_rank_t, gaspi_notification_id_t, gaspi_notification_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_remote, rank, notification_id, notification_value, queue, timeout_ms)
+    @ccall libGPI2.pgaspi_notify(segment_id_remote::gaspi_segment_id_t, rank::gaspi_rank_t, notification_id::gaspi_notification_id_t, notification_value::gaspi_notification_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2687,7 +2702,7 @@ gaspi_return_t pgaspi_notify_waitsome (const gaspi_segment_id_t segment_id_local
 ```
 """
 function pgaspi_notify_waitsome(segment_id_local, notification_begin, num, first_id, timeout_ms)
-    ccall((:pgaspi_notify_waitsome, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_notification_id_t, gaspi_number_t, Ptr{gaspi_notification_id_t}, gaspi_timeout_t), segment_id_local, notification_begin, num, first_id, timeout_ms)
+    @ccall libGPI2.pgaspi_notify_waitsome(segment_id_local::gaspi_segment_id_t, notification_begin::gaspi_notification_id_t, num::gaspi_number_t, first_id::Ptr{gaspi_notification_id_t}, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2699,7 +2714,7 @@ gaspi_return_t pgaspi_notify_reset (const gaspi_segment_id_t segment_id_local, c
 ```
 """
 function pgaspi_notify_reset(segment_id_local, notification_id, old_notification_val)
-    ccall((:pgaspi_notify_reset, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_notification_id_t, Ptr{gaspi_notification_t}), segment_id_local, notification_id, old_notification_val)
+    @ccall libGPI2.pgaspi_notify_reset(segment_id_local::gaspi_segment_id_t, notification_id::gaspi_notification_id_t, old_notification_val::Ptr{gaspi_notification_t})::gaspi_return_t
 end
 
 """
@@ -2711,7 +2726,7 @@ gaspi_return_t pgaspi_write_notify (const gaspi_segment_id_t segment_id_local, c
 ```
 """
 function pgaspi_write_notify(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, notification_value, queue, timeout_ms)
-    ccall((:pgaspi_write_notify, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_notification_id_t, gaspi_notification_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, notification_value, queue, timeout_ms)
+    @ccall libGPI2.pgaspi_write_notify(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rank::gaspi_rank_t, segment_id_remote::gaspi_segment_id_t, offset_remote::gaspi_offset_t, size::gaspi_size_t, notification_id::gaspi_notification_id_t, notification_value::gaspi_notification_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2723,7 +2738,7 @@ gaspi_return_t pgaspi_write_list_notify (const gaspi_number_t num, gaspi_segment
 ```
 """
 function pgaspi_write_list_notify(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, notification_value, queue, timeout_ms)
-    ccall((:pgaspi_write_list_notify, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_segment_id_t, gaspi_notification_id_t, gaspi_notification_t, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, notification_value, queue, timeout_ms)
+    @ccall libGPI2.pgaspi_write_list_notify(num::gaspi_number_t, segment_id_local::Ptr{gaspi_segment_id_t}, offset_local::Ptr{gaspi_offset_t}, rank::gaspi_rank_t, segment_id_remote::Ptr{gaspi_segment_id_t}, offset_remote::Ptr{gaspi_offset_t}, size::Ptr{gaspi_size_t}, segment_id_notification::gaspi_segment_id_t, notification_id::gaspi_notification_id_t, notification_value::gaspi_notification_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2735,7 +2750,7 @@ gaspi_return_t pgaspi_read_notify (const gaspi_segment_id_t segment_id_local, co
 ```
 """
 function pgaspi_read_notify(segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, queue, timeout_ms)
-    ccall((:pgaspi_read_notify, get_gpi2_library()), gaspi_return_t, (gaspi_segment_id_t, gaspi_offset_t, gaspi_rank_t, gaspi_segment_id_t, gaspi_offset_t, gaspi_size_t, gaspi_notification_id_t, gaspi_queue_id_t, gaspi_timeout_t), segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, notification_id, queue, timeout_ms)
+    @ccall libGPI2.pgaspi_read_notify(segment_id_local::gaspi_segment_id_t, offset_local::gaspi_offset_t, rank::gaspi_rank_t, segment_id_remote::gaspi_segment_id_t, offset_remote::gaspi_offset_t, size::gaspi_size_t, notification_id::gaspi_notification_id_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2747,7 +2762,7 @@ gaspi_return_t pgaspi_read_list_notify (const gaspi_number_t num, gaspi_segment_
 ```
 """
 function pgaspi_read_list_notify(num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, queue, timeout_ms)
-    ccall((:pgaspi_read_list_notify, get_gpi2_library()), gaspi_return_t, (gaspi_number_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, gaspi_rank_t, Ptr{gaspi_segment_id_t}, Ptr{gaspi_offset_t}, Ptr{gaspi_size_t}, gaspi_segment_id_t, gaspi_notification_id_t, gaspi_queue_id_t, gaspi_timeout_t), num, segment_id_local, offset_local, rank, segment_id_remote, offset_remote, size, segment_id_notification, notification_id, queue, timeout_ms)
+    @ccall libGPI2.pgaspi_read_list_notify(num::gaspi_number_t, segment_id_local::Ptr{gaspi_segment_id_t}, offset_local::Ptr{gaspi_offset_t}, rank::gaspi_rank_t, segment_id_remote::Ptr{gaspi_segment_id_t}, offset_remote::Ptr{gaspi_offset_t}, size::Ptr{gaspi_size_t}, segment_id_notification::gaspi_segment_id_t, notification_id::gaspi_notification_id_t, queue::gaspi_queue_id_t, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2759,7 +2774,7 @@ gaspi_return_t pgaspi_queue_size (const gaspi_queue_id_t queue, gaspi_number_t *
 ```
 """
 function pgaspi_queue_size(queue, queue_size)
-    ccall((:pgaspi_queue_size, get_gpi2_library()), gaspi_return_t, (gaspi_queue_id_t, Ptr{gaspi_number_t}), queue, queue_size)
+    @ccall libGPI2.pgaspi_queue_size(queue::gaspi_queue_id_t, queue_size::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2771,7 +2786,7 @@ gaspi_return_t pgaspi_queue_num (gaspi_number_t * const queue_num);
 ```
 """
 function pgaspi_queue_num(queue_num)
-    ccall((:pgaspi_queue_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), queue_num)
+    @ccall libGPI2.pgaspi_queue_num(queue_num::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2783,7 +2798,7 @@ gaspi_return_t pgaspi_queue_create(gaspi_queue_id_t * const queue_id, const gasp
 ```
 """
 function pgaspi_queue_create(queue_id, timeout_ms)
-    ccall((:pgaspi_queue_create, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_queue_id_t}, gaspi_timeout_t), queue_id, timeout_ms)
+    @ccall libGPI2.pgaspi_queue_create(queue_id::Ptr{gaspi_queue_id_t}, timeout_ms::gaspi_timeout_t)::gaspi_return_t
 end
 
 """
@@ -2795,7 +2810,7 @@ gaspi_return_t pgaspi_queue_delete(const gaspi_queue_id_t queue_id);
 ```
 """
 function pgaspi_queue_delete(queue_id)
-    ccall((:pgaspi_queue_delete, get_gpi2_library()), gaspi_return_t, (gaspi_queue_id_t,), queue_id)
+    @ccall libGPI2.pgaspi_queue_delete(queue_id::gaspi_queue_id_t)::gaspi_return_t
 end
 
 """
@@ -2807,7 +2822,7 @@ gaspi_return_t pgaspi_queue_size_max (gaspi_number_t * const queue_size_max);
 ```
 """
 function pgaspi_queue_size_max(queue_size_max)
-    ccall((:pgaspi_queue_size_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), queue_size_max)
+    @ccall libGPI2.pgaspi_queue_size_max(queue_size_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2819,7 +2834,7 @@ gaspi_return_t pgaspi_transfer_size_min (gaspi_size_t * const transfer_size_min)
 ```
 """
 function pgaspi_transfer_size_min(transfer_size_min)
-    ccall((:pgaspi_transfer_size_min, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), transfer_size_min)
+    @ccall libGPI2.pgaspi_transfer_size_min(transfer_size_min::Ptr{gaspi_size_t})::gaspi_return_t
 end
 
 """
@@ -2831,7 +2846,7 @@ gaspi_return_t pgaspi_transfer_size_max (gaspi_size_t * const transfer_size_max)
 ```
 """
 function pgaspi_transfer_size_max(transfer_size_max)
-    ccall((:pgaspi_transfer_size_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), transfer_size_max)
+    @ccall libGPI2.pgaspi_transfer_size_max(transfer_size_max::Ptr{gaspi_size_t})::gaspi_return_t
 end
 
 """
@@ -2843,7 +2858,7 @@ gaspi_return_t pgaspi_notification_num (gaspi_number_t * const notification_num)
 ```
 """
 function pgaspi_notification_num(notification_num)
-    ccall((:pgaspi_notification_num, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), notification_num)
+    @ccall libGPI2.pgaspi_notification_num(notification_num::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2855,7 +2870,7 @@ gaspi_return_t pgaspi_passive_transfer_size_max (gaspi_size_t * const passive_tr
 ```
 """
 function pgaspi_passive_transfer_size_max(passive_transfer_size_max)
-    ccall((:pgaspi_passive_transfer_size_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), passive_transfer_size_max)
+    @ccall libGPI2.pgaspi_passive_transfer_size_max(passive_transfer_size_max::Ptr{gaspi_size_t})::gaspi_return_t
 end
 
 """
@@ -2867,7 +2882,7 @@ gaspi_return_t pgaspi_allreduce_buf_size (gaspi_size_t * const buf_size);
 ```
 """
 function pgaspi_allreduce_buf_size(buf_size)
-    ccall((:pgaspi_allreduce_buf_size, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_size_t},), buf_size)
+    @ccall libGPI2.pgaspi_allreduce_buf_size(buf_size::Ptr{gaspi_size_t})::gaspi_return_t
 end
 
 """
@@ -2879,7 +2894,7 @@ gaspi_return_t pgaspi_allreduce_elem_max (gaspi_number_t * const elem_max);
 ```
 """
 function pgaspi_allreduce_elem_max(elem_max)
-    ccall((:pgaspi_allreduce_elem_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), elem_max)
+    @ccall libGPI2.pgaspi_allreduce_elem_max(elem_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2891,7 +2906,7 @@ gaspi_return_t pgaspi_rw_list_elem_max (gaspi_number_t * const elem_max);
 ```
 """
 function pgaspi_rw_list_elem_max(elem_max)
-    ccall((:pgaspi_rw_list_elem_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), elem_max)
+    @ccall libGPI2.pgaspi_rw_list_elem_max(elem_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2903,7 +2918,7 @@ gaspi_return_t pgaspi_queue_max(gaspi_number_t * const queue_max);
 ```
 """
 function pgaspi_queue_max(queue_max)
-    ccall((:pgaspi_queue_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_number_t},), queue_max)
+    @ccall libGPI2.pgaspi_queue_max(queue_max::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -2915,7 +2930,7 @@ gaspi_return_t pgaspi_network_type (gaspi_network_t * const network_type);
 ```
 """
 function pgaspi_network_type(network_type)
-    ccall((:pgaspi_network_type, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_network_t},), network_type)
+    @ccall libGPI2.pgaspi_network_type(network_type::Ptr{gaspi_network_t})::gaspi_return_t
 end
 
 """
@@ -2927,7 +2942,7 @@ gaspi_return_t pgaspi_time_ticks (gaspi_cycles_t * const ticks);
 ```
 """
 function pgaspi_time_ticks(ticks)
-    ccall((:pgaspi_time_ticks, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_cycles_t},), ticks)
+    @ccall libGPI2.pgaspi_time_ticks(ticks::Ptr{gaspi_cycles_t})::gaspi_return_t
 end
 
 """
@@ -2939,7 +2954,7 @@ gaspi_return_t pgaspi_time_get (gaspi_time_t * const wtime);
 ```
 """
 function pgaspi_time_get(wtime)
-    ccall((:pgaspi_time_get, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_time_t},), wtime)
+    @ccall libGPI2.pgaspi_time_get(wtime::Ptr{gaspi_time_t})::gaspi_return_t
 end
 
 """
@@ -2951,7 +2966,7 @@ gaspi_return_t pgaspi_cpu_frequency (gaspi_float * const cpu_mhz);
 ```
 """
 function pgaspi_cpu_frequency(cpu_mhz)
-    ccall((:pgaspi_cpu_frequency, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_float},), cpu_mhz)
+    @ccall libGPI2.pgaspi_cpu_frequency(cpu_mhz::Ptr{gaspi_float})::gaspi_return_t
 end
 
 """
@@ -2963,8 +2978,13 @@ gaspi_return_t pgaspi_state_vec_get (gaspi_state_vector_t state_vector);
 ```
 """
 function pgaspi_state_vec_get(state_vector)
-    ccall((:pgaspi_state_vec_get, get_gpi2_library()), gaspi_return_t, (gaspi_state_vector_t,), state_vector)
+    @ccall libGPI2.pgaspi_state_vec_get(state_vector::gaspi_state_vector_t)::gaspi_return_t
 end
+
+# automatic type deduction for variadic arguments may not be what you want, please use with caution
+@generated function pgaspi_printf(fmt, va_list...)
+        :(@ccall(libGPI2.pgaspi_printf(fmt::Cstring; $(to_c_type_pairs(va_list)...))::Cvoid))
+    end
 
 """
     pgaspi_print_affinity_mask()
@@ -2975,7 +2995,7 @@ void pgaspi_print_affinity_mask (void);
 ```
 """
 function pgaspi_print_affinity_mask()
-    ccall((:pgaspi_print_affinity_mask, get_gpi2_library()), Cvoid, ())
+    @ccall libGPI2.pgaspi_print_affinity_mask()::Cvoid
 end
 
 """
@@ -2987,7 +3007,7 @@ gaspi_return_t pgaspi_numa_socket(gaspi_uchar * const socket);
 ```
 """
 function pgaspi_numa_socket(socket)
-    ccall((:pgaspi_numa_socket, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_uchar},), socket)
+    @ccall libGPI2.pgaspi_numa_socket(socket::Ptr{gaspi_uchar})::gaspi_return_t
 end
 
 """
@@ -2999,7 +3019,7 @@ gaspi_return_t pgaspi_set_socket_affinity (const gaspi_uchar socket);
 ```
 """
 function pgaspi_set_socket_affinity(socket)
-    ccall((:pgaspi_set_socket_affinity, get_gpi2_library()), gaspi_return_t, (gaspi_uchar,), socket)
+    @ccall libGPI2.pgaspi_set_socket_affinity(socket::gaspi_uchar)::gaspi_return_t
 end
 
 """
@@ -3011,7 +3031,7 @@ gaspi_return_t pgaspi_statistic_verbosity_level(gaspi_number_t _verbosity_level)
 ```
 """
 function pgaspi_statistic_verbosity_level(_verbosity_level)
-    ccall((:pgaspi_statistic_verbosity_level, get_gpi2_library()), gaspi_return_t, (gaspi_number_t,), _verbosity_level)
+    @ccall libGPI2.pgaspi_statistic_verbosity_level(_verbosity_level::gaspi_number_t)::gaspi_return_t
 end
 
 """
@@ -3023,7 +3043,7 @@ gaspi_return_t pgaspi_statistic_counter_max(gaspi_statistic_counter_t* counter_m
 ```
 """
 function pgaspi_statistic_counter_max(counter_max)
-    ccall((:pgaspi_statistic_counter_max, get_gpi2_library()), gaspi_return_t, (Ptr{gaspi_statistic_counter_t},), counter_max)
+    @ccall libGPI2.pgaspi_statistic_counter_max(counter_max::Ptr{gaspi_statistic_counter_t})::gaspi_return_t
 end
 
 """
@@ -3035,7 +3055,7 @@ gaspi_return_t pgaspi_statistic_counter_info(gaspi_statistic_counter_t counter, 
 ```
 """
 function pgaspi_statistic_counter_info(counter, counter_argument, counter_name, counter_description, verbosity_leve)
-    ccall((:pgaspi_statistic_counter_info, get_gpi2_library()), gaspi_return_t, (gaspi_statistic_counter_t, Ptr{gaspi_statistic_argument_t}, Ptr{gaspi_string_t}, Ptr{gaspi_string_t}, Ptr{gaspi_number_t}), counter, counter_argument, counter_name, counter_description, verbosity_leve)
+    @ccall libGPI2.pgaspi_statistic_counter_info(counter::gaspi_statistic_counter_t, counter_argument::Ptr{gaspi_statistic_argument_t}, counter_name::Ptr{gaspi_string_t}, counter_description::Ptr{gaspi_string_t}, verbosity_leve::Ptr{gaspi_number_t})::gaspi_return_t
 end
 
 """
@@ -3047,7 +3067,7 @@ gaspi_return_t pgaspi_statistic_counter_get (gaspi_statistic_counter_t counter, 
 ```
 """
 function pgaspi_statistic_counter_get(counter, argument, valu)
-    ccall((:pgaspi_statistic_counter_get, get_gpi2_library()), gaspi_return_t, (gaspi_statistic_counter_t, gaspi_number_t, Ptr{Culong}), counter, argument, valu)
+    @ccall libGPI2.pgaspi_statistic_counter_get(counter::gaspi_statistic_counter_t, argument::gaspi_number_t, valu::Ptr{Culong})::gaspi_return_t
 end
 
 """
@@ -3059,7 +3079,7 @@ gaspi_return_t pgaspi_statistic_counter_reset (gaspi_statistic_counter_t counter
 ```
 """
 function pgaspi_statistic_counter_reset(counter)
-    ccall((:pgaspi_statistic_counter_reset, get_gpi2_library()), gaspi_return_t, (gaspi_statistic_counter_t,), counter)
+    @ccall libGPI2.pgaspi_statistic_counter_reset(counter::gaspi_statistic_counter_t)::gaspi_return_t
 end
 
 """
@@ -3071,7 +3091,7 @@ gaspi_string_t pgaspi_error_str(gaspi_return_t error_code);
 ```
 """
 function pgaspi_error_str(error_code)
-    ccall((:pgaspi_error_str, get_gpi2_library()), gaspi_string_t, (gaspi_return_t,), error_code)
+    @ccall libGPI2.pgaspi_error_str(error_code::gaspi_return_t)::gaspi_string_t
 end
 
 const GASPI_GROUP_ALL = gaspi_rank_t(0)

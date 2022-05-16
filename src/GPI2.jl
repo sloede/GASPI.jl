@@ -1,22 +1,19 @@
 module GPI2
 
-using Preferences: @load_preference, @set_preferences!, @has_preference
+using Preferences: load_preference, @set_preferences!
 using Reexport: @reexport
+using GPI2_jll
 
-export get_gpi2_library, set_gpi2_library!
+const libGPI2 = load_preference(GPI2, "libGPI2", GPI2_jll.libGPI2)
 
-function get_gpi2_library()
-  if haskey(ENV, "JULIA_GPI2_LIBRARY")
-    return ENV["JULIA_GPI2_LIBRARY"]
-  elseif @has_preference("gpi2_library")
-    return @load_preference("gpi2_library")
-  else
-    error("missing path to GPI-2 library (specify via `set_gpi2_library!(path)` or via environment variable `JULIA_GPI2_LIBRARY`)")
-  end
+function use_jll_library()
+  @set_preferences!("libGPI2" => GPI2_jll.libGPI2)
+  @info "Using JLL-provided GPI-2 library. Please restart Julia for the change to take effect."
 end
 
-function set_gpi2_library!(path)
-  @set_preferences!("gpi2_library" => path)
+function use_system_library(path)
+  @set_preferences!("libGPI2" => path)
+  @info "Using user-provided GPI-2 library. Please restart Julia for the change to take effect."
 end
 
 include("LibGPI2.jl")
