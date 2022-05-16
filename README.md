@@ -6,7 +6,8 @@ GPI2.jl is a lightweight Julia wrapper for the [GASPI](https://www.gaspi.de/)-co
 ## Installation
 If you have not yet installed Julia, please [follow the instructions for your
 operating system](https://julialang.org/downloads/platform/). GPI2.jl works
-with Julia v1.7.
+with Julia v1.7. Since GPI-2 only works on Linux systems, GPI2.jl is also
+restricted to this platform.
 
 At the time of writing, GPI2.jl is not a registered package. Thus to install it
 in your default environment, execute the following command:
@@ -26,19 +27,26 @@ add `--project=.` to the `julia` command, e.g.,
 julia --project=. -e 'using GPI2; ...'
 ```
 
-Before using GPI2.jl, you need to specify the path to the GASPI
-library you want to use. Thus you need to have a GASPI-conforming library installed on your
-system, e.g., [GPI-2](https://github.com/cc-hpc-itwm/GPI-2). Execute
+
+## Configuration
+When using GPI2.jl, you can specify the path to the GASPI
+library you want to use. By default, GPI2.jl uses the precompiled GPI-2 library
+available in the GPI2\_jll.jl package. This is only recommended for
+non-performance critical usage and/or development. To switch to a
+library installed on your system, execute
 ```julia
-julia -e 'using GPI2; set_gaspi_library!("/path/to/libGPI2.so")'
+julia -e 'using GPI2; GPI2.use_system_library("/path/to/libGPI2.so")'
 ```
-where `/path/to/libGPI.so` should be the *absolute* path to your *shared* GPI-2 library,
-e.g., to `libGPI2.so` if you are on Linux and using the
-GPI-2 library. This step is necessary only once per project in which you use
-GPI2.jl.
+where `/path/to/libGPI.so` should be the *absolute* path to your *shared* GPI-2 library.
+To switch back to using the JLL-provided library, execute
+```julia
+julia -e 'using GPI2; GPI2.use_jll_library()'
+```
 
 
 ## Usage
+
+### Getting started
 You can start running GASPI functions after executing `using GPI2`. All GASPI
 functions are prefixed by `gaspi_`. For example, to check the version of the
 currently used GPI-2 library, start the Julia REPL and paste the following
@@ -56,7 +64,7 @@ julia> println("GPI-2 library version: $(version[])")
 GPI-2 library version: 1.51
 ```
 
-### Using GPI2.jl with GPI-2
+### Parallel execution
 If you want to start a parallel process using GPI-2's `gaspi_run`, there are
 some issues you need to handle in order to make a GASPI program run properly.
 They boil down to the fact that, as far as I can tell, GPI-2 uses SSH to set up
