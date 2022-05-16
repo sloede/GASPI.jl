@@ -2,7 +2,7 @@
 # it could also be an expression as long as `Meta.parse` can parse this string successfully.
 # basically, it should be the `expression` in the following code:
 # ccall((function_name, expression), returntype, (argtype1, ...), argvalue1, ...)
-library_name = "get_gpi2_library()"
+library_name = "libGPI2"
 
 # this entry allows you to specify different library names for different headers.
 # in the following example:
@@ -149,10 +149,10 @@ opaque_func_arg_as_PtrCvoid = false
 opaque_as_mutable_struct = true
 
 # if true, use Julia 1.5's new `@ccall` macro
-use_ccall_macro = false
+use_ccall_macro = true
 
 # if true, variadic functions are wrapped with `@ccall` macro. Otherwise variadic functions are ignored.
-wrap_variadic_function = false
+wrap_variadic_function = true
 
 # generate getproperty/setproperty! methods for the types in the following list
 field_access_method_list = []
