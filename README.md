@@ -2,6 +2,11 @@
 GPI2.jl is a lightweight Julia wrapper for the [GASPI](https://www.gaspi.de/)-conforming
 [GPI-2](https://github.com/cc-hpc-itwm/GPI-2) library.
 
+**Caveat: Everything in here is still very much in *alpha* stage. Specifically,
+this repository's location is likely to change, so please do not link to it.
+Further, the dependency `GPI2_jll.jl` is not yet released, thus currently you
+are *not* able use this package outside my development environment.**
+
 
 ## Installation
 If you have not yet installed Julia, please [follow the instructions for your
