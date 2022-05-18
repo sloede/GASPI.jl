@@ -42,7 +42,7 @@ function gaspi_run()
   end
 end
 
-include("LibGPI2.jl")
+include("../bindings/LibGPI2.jl")
 @reexport using .LibGPI2
 
 end # module
