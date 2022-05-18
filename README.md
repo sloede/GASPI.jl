@@ -1,4 +1,9 @@
 # GPI2.jl
+
+[![Build Status](https://github.com/sloede/GPI2.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/sloede/GPI2.jl/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://opensource.org/licenses/MIT)
+
+
 GPI2.jl is a lightweight Julia wrapper for the [GASPI](https://www.gaspi.de/)-conforming
 [GPI-2](https://github.com/cc-hpc-itwm/GPI-2) library.
 
