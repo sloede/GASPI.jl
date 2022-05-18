@@ -11,4 +11,5 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
 CEnum = "0.4"
+Preferences = "1"
 Reexport = "1"
