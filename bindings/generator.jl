@@ -1,8 +1,9 @@
 using Clang.Generators
+using GPI2_jll
 
 cd(@__DIR__)
 
-include_dir = ENV["GPI2_INCLUDE_DIR"]
+include_dir = get(ENV, "GPI2_INCLUDE_DIR", joinpath(GPI2_jll.artifact_dir, "include"))
 
 options = load_options(joinpath(@__DIR__, "generator.toml"))
 

@@ -38,22 +38,6 @@ julia --project=. -e 'using GPI2; ...'
 ```
 
 
-## Configuration
-When using GPI2.jl, you can specify the path to the GASPI
-library you want to use. By default, GPI2.jl uses the precompiled GPI-2 library
-available in the GPI2\_jll.jl package. This is only recommended for
-non-performance critical usage and/or development. To switch to a
-library installed on your system, execute
-```julia
-julia -e 'using GPI2; GPI2.use_system_library("/path/to/libGPI2.so")'
-```
-where `/path/to/libGPI.so` should be the *absolute* path to your *shared* GPI-2 library.
-To switch back to using the JLL-provided library, execute
-```julia
-julia -e 'using GPI2; GPI2.use_jll_library()'
-```
-
-
 ## Usage
 
 ### Getting started
@@ -111,6 +95,48 @@ take care of recreating the environment using the information in the TOML file
 programm (and optional command line arguments to it) as the final part. The path
 to the Julia program may be relative or absolute, since the launcher knows your
 current directory by now.
+
+
+## Configuration
+### Using a system library
+When using GPI2.jl, you can specify the path to the GASPI
+library you want to use. By default, GPI2.jl uses the precompiled GPI-2 library
+available in the GPI2\_jll.jl package. This is only recommended for
+non-performance critical usage and/or development. To switch to a
+library installed on your system, execute
+```julia
+julia -e 'using GPI2; GPI2.use_system_library("/path/to/libGPI2.so")'
+```
+where `/path/to/libGPI.so` should be the *absolute* path to your *shared* GPI-2 library.
+To switch back to using the JLL-provided library, execute
+```julia
+julia -e 'using GPI2; GPI2.use_jll_library()'
+```
+After switching the library, you need to restart Julia for the changes to take
+effect.
+
+### Generating C bindings
+In case you are using a system-provided GPI-2 library with an API that is different
+to the one provided by the JLL-provided library, you need to re-generate the
+C bindings file `LibGPI2.jl` and tell the GPI2.jl package to use it.
+
+To this end, enter the `bindings/` directory and run the following command:
+```shell
+julia --project=. -e 'using Pkg; Pkg.instantiate()' # only required once
+GPI_INCLUDE_DIR=path/to/GPI-2/include julia --project=. generator.jl
+```
+This will create a `LibGPI2.jl` file in the current working directory. To switch
+to the custom bindings file, execute
+```julia
+julia -e 'using GPI2; GPI2.use_system_bindings("path/to/LibGPI2.jl")'
+```
+where `path/to/libGPI.so` should be the path to your custom C bindings file.
+To switch back to using the JLL-compatible library, execute
+```julia
+julia -e 'using GPI2; GPI2.use_jll_bindings()'
+```
+After switching the C bindings, you need to restart Julia for the changes to take
+effect.
 
 
 ## Authors
