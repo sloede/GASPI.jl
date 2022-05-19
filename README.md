@@ -1,5 +1,7 @@
 # GPI2.jl
 
+**NOTE: This repository has been archived in favor of https://github.com/hlrs-tasc/GPI2.jl.**
+
 [![Build Status](https://github.com/sloede/GPI2.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/sloede/GPI2.jl/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://opensource.org/licenses/MIT)
 
