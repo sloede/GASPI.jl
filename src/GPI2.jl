@@ -42,7 +42,6 @@ function gaspi_logger()
     run(`$gaspi_logger_executable`)
   catch InterruptException
     if !isinteractive()
-      println("Caught Ctrl-C, stopping...")
       exit()
     end
   end
@@ -53,7 +52,6 @@ function gaspi_run()
     run(`$gaspi_run_executable $ARGS`)
   catch InterruptException
     if !isinteractive()
-      println("Caught Ctrl-C, stopping...")
       exit()
     end
   end

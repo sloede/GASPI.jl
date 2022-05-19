@@ -58,14 +58,43 @@ julia> println("GPI-2 library version: $(version[])")
 GPI-2 library version: 1.51
 ```
 
+
 ### Parallel execution
-If you want to start a parallel process using GPI-2's `gaspi_run`, there are
+To run a GPI-2 program in parallel, you need to start it with the helper script
+`gaspi_run`. It requires a machinefile with the names of the nodes on which a
+rank should be started, see also the GPI-2 [docs](https://github.com/cc-hpc-itwm/GPI-2).
+For a simple test, you can create a machinefile that will start three ranks on
+the current node by running
+```shell
+yes `hostname` | head -n 3 > machinefile
+```
+
+For convenience, GPI2.jl provides the function `gaspi_run()` that
+will start `gaspi_run` for you, using the GPI2\_jll.jl-provided executable. GPI2.jl also
+provides some example files in the [examples/](examples/) folder you can check
+out to get started.
+
+For example, to run the [`hello_world.jl`](examples/hello_world.jl) example in
+parallel, execute the following commands in Julia:
+```shell
+julia -e 'using GPI2; gaspi_run()' -- -m machinefile $(which julia) $(pwd)/examples/hello_world.jl
+```
+Yes, you need `julia` twice in the command: The first one just executes the `gaspi_run`
+command, while the second one is the command that is executed in parallel. And
+yes, you need the `$(pwd)`s to ensure that the `gaspi_run` does pick the right
+files. If you have not installed GPI2.jl in your default Julia depot, you also
+need to add a `--project="/abs/path/to/GPI2.jl"` argument to each call to Julia.
+
+
+### Issues when relying on the `module` command
+If you want to start a parallel process using GPI-2's `gaspi_run` on a cluster
+where paths are , there are
 some issues you need to handle in order to make a GASPI program run properly.
 They boil down to the fact that, as far as I can tell, GPI-2 uses SSH to set up
 communication between nodes and uses a non-login shell for this purpose. This
-means that, e.g., the `module` command prevalent on compute clusters will not
-work and thus you need to manually put all relevant changes to the environment
-variables directly in your `~/.bashrc` file.
+means that, e.g., the `module` command will not work and thus you need to
+manually put all relevant changes to the environment variables directly in your
+`~/.bashrc` file.
 
 As a workaround, this repository provides two auxiliary utilities:
 [`storeenv.jl`](utils/storeenv.jl) and [`launcher.jl`](utils/launcher.jl). They
