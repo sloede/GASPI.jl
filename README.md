@@ -7,11 +7,6 @@
 GPI2.jl is a lightweight Julia wrapper for the [GASPI](https://www.gaspi.de/)-conforming
 [GPI-2](https://github.com/cc-hpc-itwm/GPI-2) library.
 
-**Caveat: Everything in here is still very much in *alpha* stage. Specifically,
-this repository's location is likely to change, so please do not link to it.
-Further, the dependency `GPI2_jll.jl` is not yet released, thus currently you
-are *not* able use this package outside my development environment.**
-
 
 ## Installation
 If you have not yet installed Julia, please [follow the instructions for your
@@ -88,7 +83,7 @@ need to add a `--project="/abs/path/to/GPI2.jl"` argument to each call to Julia.
 
 ### Issues when relying on the `module` command
 If you want to start a parallel process using GPI-2's `gaspi_run` on a cluster
-where paths are , there are
+where paths are set using the `module` command provided by, e.g., Lmod, there are
 some issues you need to handle in order to make a GASPI program run properly.
 They boil down to the fact that, as far as I can tell, GPI-2 uses SSH to set up
 communication between nodes and uses a non-login shell for this purpose. This
@@ -99,7 +94,7 @@ manually put all relevant changes to the environment variables directly in your
 As a workaround, this repository provides two auxiliary utilities:
 [`storeenv.jl`](utils/storeenv.jl) and [`launcher.jl`](utils/launcher.jl). They
 help you to run a GPI-2-powered Julia program on a cluster with the environment
-set up using, e.g., Lmod.
+set up using, e.g., Lmod, by storing the entire environment and reloading it..
 
 First, go to the folder from which you want to start your GASPI-parallelized Julia program
 and execute the `storeenv.jl` script:
@@ -116,14 +111,12 @@ following command:
 gaspi_run -m <machinefile> $(which julia) /abs/path/to/launcher.jl $(pwd)/gaspi-jl-env.toml path/to/julia/program.jl
 ```
 The `<machinefile>` is the normal machinefile with all nodes on which to start a
-GASPI rank. `$(which julia)` is required since without `module` support, the
-remote ranks might not know where the Julia executable is located. The
-`/abs/path/to/launcher.jl` must be an *absolute* path again. The launcher script will
-take care of recreating the environment using the information in the TOML file
-`$(pwd)/gaspi-jl-env.toml`. Finally, you can provide the path to the Julia
-programm (and optional command line arguments to it) as the final part. The path
-to the Julia program may be relative or absolute, since the launcher knows your
-current directory by now.
+GASPI rank. The `/abs/path/to/launcher.jl` must be an *absolute* path again. The
+launcher script will take care of recreating the environment using the
+information in the TOML file `$(pwd)/gaspi-jl-env.toml`. Finally, you can
+provide the path to the Julia programm (and optional command line arguments to
+it) as the final part. The path to the Julia program may be relative or
+absolute, since the launcher knows your current directory by now.
 
 
 ## Configuration
@@ -136,7 +129,7 @@ library installed on your system, execute
 ```julia
 julia -e 'using GPI2; GPI2.use_system_library("/path/to/libGPI2.so")'
 ```
-where `/path/to/libGPI.so` should be the *absolute* path to your *shared* GPI-2 library.
+where `/path/to/libGPI.so` should be the path to your *shared* GPI-2 library.
 To switch back to using the JLL-provided library, execute
 ```julia
 julia -e 'using GPI2; GPI2.use_jll_library()'
